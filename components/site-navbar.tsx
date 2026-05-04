@@ -73,7 +73,7 @@ export function SiteNavbar() {
     };
   }, []);
 
-  const isDark = mounted && theme === 'dark';
+  const isLight = mounted && theme === 'light';
 
   return (
     <div
@@ -106,12 +106,12 @@ export function SiteNavbar() {
 
           <button
             type="button"
-            onClick={() => setTheme(isDark ? 'light' : 'dark')}
+            onClick={() => setTheme(isLight ? 'dark' : 'light')}
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-secondary"
             aria-label="Toggle color theme">
-            {isDark ?
-              <Sun className="h-4 w-4" />
-            : <Moon className="h-4 w-4" />}
+            {isLight ?
+              <Moon className="h-4 w-4" />
+            : <Sun className="h-4 w-4" />}
           </button>
         </div>
       </div>
