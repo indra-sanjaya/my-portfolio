@@ -42,14 +42,12 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}>
           <a
             href="#projects"
-            target="_blank"
             rel="noopener noreferrer"
             className="group inline-flex items-center gap-2 px-8 py-4 bg-foreground text-background rounded-full font-medium transition-all duration-300 hover:bg-foreground/90 hover:scale-[1.02]">
             View Projects
           </a>
           <a
             href="#contact"
-            target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 border border-border text-foreground rounded-full font-medium transition-all duration-300 hover:bg-secondary hover:border-transparent">
             Get in Touch
