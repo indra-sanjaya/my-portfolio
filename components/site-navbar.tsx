@@ -16,7 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'about', label: 'About' },
   { id: 'philosophy', label: 'Approach' },
   { id: 'tech-stack', label: 'Stack' },
-  { id: 'certifications', label: 'Certs' },
+  { id: 'certifications', label: 'Certifications' },
   { id: 'contact', label: 'Contact' },
 ];
 

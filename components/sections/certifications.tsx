@@ -7,6 +7,11 @@ import { title } from 'process';
 
 const certifications = [
   {
+    title: 'Full Stack JavaScript Immersive Program',
+    earnedOn: 'April 2026',
+    link: 'https://drive.google.com/file/d/1Bl10C-ROPCSAk6DMyp31EVEP_DJDshs4/view?usp=drive_link',
+  },
+  {
     title: 'Software Engineer Intern',
     earnedOn: 'March 2026',
     link: 'https://www.hackerrank.com/certificates/00e98616eead',
