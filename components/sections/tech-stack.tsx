@@ -152,6 +152,11 @@ const categories: Category[] = [
         icon: <MdOutlineAccountBox />,
         color: '#10B981',
       },
+      {
+        name: 'JsonWebToken',
+        icon: <IoIosLock />,
+        color: '#F59E0B',
+      },
     ],
   },
 
@@ -287,7 +292,7 @@ export function TechStackSection() {
           relative overflow-hidden
           rounded-3xl border border-border
           bg-card/50 backdrop-blur-sm
-          p-7
+          p-7 transition-all duration-300 hover:scale-110
           ${isAI ? 'md:col-span-2' : ''}
         `}>
                 {/* subtle glow */}
@@ -295,7 +300,7 @@ export function TechStackSection() {
 
                 {/* CATEGORY HEADER */}
                 <div className="relative mb-7">
-                  <h3 className="text-xl font-semibold text-foreground">{category.title}</h3>
+                  <h3 className="text-xl font-semibold text-foreground text-center justify-center">{category.title}</h3>
 
                   <p className="mt-2 text-sm leading-7 text-muted-foreground">{category.description}</p>
                 </div>
@@ -343,7 +348,7 @@ export function TechStackSection() {
                     flex items-center justify-center
                     w-9 h-9 rounded-xl
                     border text-lg shrink-0
-                    transition-all duration-300
+                    transition-all duration-300 hover:scale-110
                   "
                           style={{
                             color: tech.color === '#ffffff' ? 'hsl(var(--foreground))' : tech.color,

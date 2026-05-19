@@ -21,9 +21,9 @@ export default function Home() {
         </div>
 
         <HeroSection />
+        <AboutSection />
         <ImpactSection />
         <ProjectsSection />
-        <AboutSection />
         <PhilosophySection />
         <TechStackSection />
         <CertificationsSection />

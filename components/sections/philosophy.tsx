@@ -134,6 +134,7 @@ export function PhilosophySection() {
                 transition-all duration-300
                 hover:border-primary/20
                 hover:shadow-xl
+                hover:bg-cyan-300/20
               ">
               {/* hover glow */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-br from-primary/[0.05] via-transparent to-transparent" />

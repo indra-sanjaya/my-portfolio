@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
+import Image from 'next/image'; // ✅ Added Next.js Image Component
 import { ArrowUpRight, BrainCircuit, Building2, Code2 } from 'lucide-react';
 import { useAnimationConfig } from '@/hooks/use-animation-config';
 
@@ -56,7 +57,6 @@ export function AboutSection() {
   };
 
   return (
-    // ✅ FIX 1: Use variants consistently — no mixed initial/animate + variants
     <motion.section
       id="about"
       ref={ref}
@@ -65,30 +65,48 @@ export function AboutSection() {
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}>
       <div className="absolute inset-0 pointer-events-none">
-        {/* ✅ FIX 2: will-change for GPU compositing on the glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-primary/5 blur-3xl rounded-full will-change-transform" />
       </div>
 
       <div className="relative max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-[0.8fr_1.2fr] gap-20 items-start">
-          {/* LEFT — ✅ FIX 3: self-start required for sticky to work in Grid */}
+          {/* LEFT — Profile & Header Context */}
           <motion.div
             variants={itemVariants}
             custom={0.1}
             initial="hidden"
             animate={isInView ? 'visible' : 'hidden'}
-            className="sticky top-32 self-start">
+            className="sticky top-32 self-start flex flex-col">
             <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground">Background</span>
             <h2 className="mt-5 text-5xl md:text-6xl font-bold tracking-tight leading-tight text-foreground">About</h2>
+
             <p className="mt-8 text-lg leading-8 text-muted-foreground max-w-md">
               Combining analytical thinking from industrial engineering with modern software development to build
               scalable, reliable, and intelligent digital products.
             </p>
-            {/* ✅ FIX 4: gradient direction from-primary to-transparent reads correctly L→R */}
+
+            {/* ✅ NEW: Professional Interactive Profile Image Frame */}
+            <motion.div
+              className="relative mt-8 group w-full max-w-[320px] aspect-[4/5] overflow-hidden rounded-2xl border border-border bg-muted"
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}>
+              <Image
+                src="/profile_picture2.jpg" // Swap with your actual static asset path
+                alt="Profile picture"
+                fill
+                sizes="(max-w-750px) 100vw, 320px"
+                className="object-cover object-center grayscale contrast-125 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out"
+                style={{ objectPosition: '50% 80%' }}
+                priority
+              />
+              {/* Overlay shadow tint to anchor it to your dark theme seamlessly */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-transparent pointer-events-none" />
+            </motion.div>
+
             <div className="mt-10 w-16 h-px bg-gradient-to-r from-primary to-transparent" />
           </motion.div>
 
-          {/* RIGHT */}
+          {/* RIGHT — Copywrite & Highlights blocks */}
           <motion.div
             variants={itemVariants}
             custom={0.2}
@@ -98,7 +116,6 @@ export function AboutSection() {
             <div className="relative overflow-hidden rounded-3xl border border-border bg-card/60 backdrop-blur-sm p-8 md:p-10">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-transparent pointer-events-none" />
               <div className="relative">
-                {/* ✅ FIX 5: balanced type scale — 2xl/3xl consistent with body rhythm */}
                 <p className="text-2xl md:text-3xl leading-relaxed font-light text-foreground">
                   I started in engineering, solving large-scale environmental and industrial challenges.
                 </p>
@@ -116,7 +133,6 @@ export function AboutSection() {
 
             <div className="grid md:grid-cols-3 gap-5">
               {highlights.map((item, index) => (
-                // ✅ FIX 6: pure framer-motion hover — removed conflicting transition-all CSS
                 <motion.div
                   key={item.title}
                   variants={cardVariants}

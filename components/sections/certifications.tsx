@@ -9,37 +9,64 @@ const certifications = [
   {
     title: 'Full Stack JavaScript Immersive Program',
     issuer: 'Hacktiv8',
+    logo: '/hacktiv8-logo.jpg',
     earnedOn: 'April 2026',
     featured: true,
     link: 'https://drive.google.com/file/d/1Bl10C-ROPCSAk6DMyp31EVEP_DJDshs4/view?usp=drive_link',
   },
   {
+    title: 'Frontend Developer (React)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/eb1747524342',
+  },
+  {
+    title: 'Software Engineer',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/9c865a0b35ff',
+  },
+  {
+    title: 'Rest API (Intermediate)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/b67cbaf726cb',
+  },
+  {
     title: 'Software Engineer Intern',
     issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
     earnedOn: 'March 2026',
     link: 'https://www.hackerrank.com/certificates/00e98616eead',
   },
   {
     title: 'JavaScript (Basic)',
     issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
     earnedOn: 'March 2026',
     link: 'https://www.hackerrank.com/certificates/818911bb4e26',
   },
   {
     title: 'React (Basic)',
     issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
     earnedOn: 'March 2026',
     link: 'https://www.hackerrank.com/certificates/ebbcb4f5b143',
   },
   {
     title: 'CSS (Basic)',
     issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
     earnedOn: 'March 2026',
     link: 'https://www.hackerrank.com/certificates/40d50e92e728',
   },
   {
     title: 'Problem Solving (Basic)',
     issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
     earnedOn: 'March 2026',
     link: 'https://www.hackerrank.com/certificates/50443addb6f4',
   },
@@ -124,9 +151,13 @@ export function CertificationsSection() {
                   {/* Left */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
-                      <BadgeCheck className="w-4 h-4 text-primary" />
+                      <img
+                        src={cert.logo}
+                        alt={`${cert.issuer} logo`}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
 
-                      <span className="text-sm text-muted-foreground font-medium">{cert.issuer}</span>
+                      <span className="text-sm text-muted-foreground font-large">{cert.issuer}</span>
                     </div>
 
                     <div>
