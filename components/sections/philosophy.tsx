@@ -3,6 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { BrainCircuit, Layers3, Rocket, LineChart, RefreshCcw, Sparkles } from 'lucide-react';
+import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 const principles = [
   {
@@ -49,26 +50,27 @@ const principles = [
   },
 ];
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      delay: i * 0.08,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  }),
-};
-
 export function PhilosophySection() {
   const ref = useRef(null);
+  const { duration, durationFast } = useAnimationConfig();
 
   const isInView = useInView(ref, {
     once: true,
     amount: 0.2,
   });
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: durationFast,
+        delay: i * 0.08,
+        ease: [0.25, 0.1, 0.25, 1],
+      },
+    }),
+  };
 
   return (
     <motion.section
@@ -81,11 +83,11 @@ export function PhilosophySection() {
         border-t border-border
         scroll-mt-28
       "
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.7,
-        ease: [0.25, 0.1, 0.25, 1],
+      initial="hidden"
+      animate={isInView ? 'visible' : 'hidden'}
+      variants={{
+        hidden: { opacity: 0, y: 40 },
+        visible: { opacity: 1, y: 0, transition: { duration, ease: [0.25, 0.1, 0.25, 1] } },
       }}>
       {/* subtle background glow */}
       <div className="absolute inset-0 pointer-events-none">

@@ -2,6 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useMemo, useRef } from 'react';
+import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 import {
   SiJavascript,
@@ -241,6 +242,7 @@ const categories: Category[] = [
 
 export function TechStackSection() {
   const ref = useRef<HTMLDivElement | null>(null);
+  const { duration, durationFast } = useAnimationConfig();
 
   const isInView = useInView(ref, {
     once: true,
@@ -254,7 +256,7 @@ export function TechStackSection() {
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration }}
           className="mb-20">
           <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground">Technologies</span>
 
@@ -278,7 +280,7 @@ export function TechStackSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{
-                  duration: 0.5,
+                  duration: durationFast,
                   delay: categoryIndex * 0.06,
                 }}
                 className={`
@@ -306,7 +308,7 @@ export function TechStackSection() {
                       initial={{ opacity: 0, scale: 0.96 }}
                       animate={isInView ? { opacity: 1, scale: 1 } : {}}
                       transition={{
-                        duration: 0.3,
+                        duration: durationFast,
                         delay: categoryIndex * 0.06 + index * 0.025,
                       }}
                       whileHover={{ y: -3 }}
@@ -345,8 +347,8 @@ export function TechStackSection() {
                   "
                           style={{
                             color: tech.color === '#ffffff' ? 'hsl(var(--foreground))' : tech.color,
-                            backgroundColor: tech.color === '#ffffff' ? 'rgba(255,255,255,0.06)' : `${tech.color}15`,
-                            borderColor: tech.color === '#ffffff' ? 'rgba(255,255,255,0.08)' : `${tech.color}25`,
+                            backgroundColor: tech.color === '#ffffff' ? 'rgba(128,128,128,0.12)' : `${tech.color}15`,
+                            borderColor: tech.color === '#ffffff' ? 'rgba(128,128,128,0.2)' : `${tech.color}25`,
                           }}>
                           {tech.icon}
                         </div>

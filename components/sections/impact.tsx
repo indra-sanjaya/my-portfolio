@@ -3,6 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Leaf, ShieldCheck, Award, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
+import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 const metrics = [
   {
@@ -70,31 +71,32 @@ const iconColors = [
   'text-emerald-400',
 ];
 
-const sectionVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      delay: i * 0.12,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  }),
-};
-
 export function ImpactSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const { duration, durationFast } = useAnimationConfig();
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration, ease: [0.25, 0.1, 0.25, 1] },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: durationFast,
+        delay: i * 0.12,
+        ease: [0.25, 0.1, 0.25, 1],
+      },
+    }),
+  };
 
   return (
     <motion.section
@@ -143,9 +145,7 @@ export function ImpactSection() {
 `}>
                 {/* ICON */}
                 <div className="mb-6 inline-flex items-center justify-center w-11 h-11 rounded-xl bg-secondary/60 border border-border/40">
-                  <Icon
-                    className={`w-5 h-5 ${iconColors[index]} transition-colors text-foreground/80 group-hover:text-foreground`}
-                  />
+                  <Icon className={`w-5 h-5 transition-colors group-hover:opacity-100 ${iconColors[index]}`} />
                 </div>
 
                 {/* VALUE */}

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ArrowDown, ArrowRight } from 'lucide-react';
+import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 const SKILLS = ['TypeScript', 'React', 'Node.js', 'PostgreSQL', 'AWS', 'System Design'];
 
@@ -40,6 +41,8 @@ function GridBackground() {
 }
 
 export function HeroSection() {
+  const { duration, durationFast, durationSlow } = useAnimationConfig();
+
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center px-6 py-32 overflow-hidden">
       <GridBackground />
@@ -49,7 +52,7 @@ export function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}>
+          transition={{ duration, ease: [0.16, 1, 0.3, 1] }}>
           <span
             className="inline-flex items-center gap-2.5 px-4 py-1.5 mb-8 text-xs tracking-widest uppercase rounded-full border font-medium"
             style={{
@@ -58,11 +61,10 @@ export function HeroSection() {
               background: 'rgba(34,211,238,0.06)',
             }}>
             <span
-              className="w-1.5 h-1.5 rounded-full"
+              className="w-1.5 h-1.5 rounded-full animate-pulse"
               style={{
                 background: 'rgb(34,211,238)',
                 boxShadow: '0 0 6px rgb(34,211,238)',
-                animation: 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite',
               }}
             />
             Software Developer
@@ -74,7 +76,7 @@ export function HeroSection() {
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight text-foreground text-balance leading-[1.1]"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}>
+          transition={{ duration: durationSlow, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}>
           I build scalable systems that solve{' '}
           <span
             style={{
@@ -92,7 +94,7 @@ export function HeroSection() {
           className="mt-8 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
+          transition={{ duration: durationSlow, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
           8+ years of engineering experience in high-impact industries, now crafting software with the same analytical
           precision.
         </motion.p>
@@ -102,7 +104,7 @@ export function HeroSection() {
           className="mt-10 flex flex-wrap items-center justify-center gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.35 }}>
+          transition={{ duration: durationFast, delay: 0.35 }}>
           {SKILLS.map((skill, i) => (
             <motion.span
               key={skill}
@@ -113,7 +115,7 @@ export function HeroSection() {
               }}
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.35, delay: 0.38 + i * 0.06, ease: 'easeOut' }}>
+              transition={{ duration: durationFast, delay: 0.38 + i * 0.06, ease: 'easeOut' }}>
               {skill}
             </motion.span>
           ))}
@@ -124,7 +126,7 @@ export function HeroSection() {
           className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}>
+          transition={{ duration: durationSlow, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}>
           <a
             href="#projects"
             className="group inline-flex items-center gap-2 px-8 py-4 rounded-full font-medium transition-all duration-300 hover:scale-[1.03] hover:brightness-110"
@@ -149,9 +151,11 @@ export function HeroSection() {
         className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 1 }}>
+        transition={{ delay: 1.2, duration: durationSlow }}>
         <span className="text-[10px] tracking-widest uppercase text-muted-foreground/40">Scroll</span>
-        <motion.div animate={{ y: [0, 7, 0] }} transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}>
+        <motion.div
+          animate={{ y: [0, 7, 0] }}
+          transition={{ duration: durationSlow * 2, repeat: Infinity, ease: 'easeInOut' }}>
           <ArrowDown className="w-4 h-4 text-muted-foreground/40" />
         </motion.div>
       </motion.div>

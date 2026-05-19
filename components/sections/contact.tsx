@@ -3,6 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Mail, Linkedin, Github, ArrowUpRight, Instagram } from 'lucide-react';
+import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 const links = [
   {
@@ -31,22 +32,23 @@ const links = [
   },
 ];
 
-const itemVariants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.6,
-      delay: 0.25 + i * 0.1,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  }),
-};
-
 export function ContactSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.25 });
+  const { duration } = useAnimationConfig();
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration,
+        delay: 0.25 + i * 0.1,
+        ease: [0.25, 0.1, 0.25, 1],
+      },
+    }),
+  };
 
   return (
     <motion.section
@@ -55,20 +57,20 @@ export function ContactSection() {
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}>
+      transition={{ duration, ease: [0.25, 0.1, 0.25, 1] }}>
       <div className="max-w-5xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}>
+            transition={{ duration, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}>
             <span className="text-xs tracking-widest uppercase text-muted-foreground">Contact</span>
             <div className="mt-6 mb-8 flex items-center gap-4">
               <div className="relative shrink-0">
                 <img
                   src="/profile_picture.jpg"
                   alt="Indra Sanjaya"
-                  className="w-25 h-25 rounded-full object-cover object-top ring-2 ring-border"
+                  className="w-24 h-24 rounded-full object-cover object-top ring-2 ring-border"
                   style={{ objectPosition: '50% 25%' }}
                 />
                 <span className="absolute bottom-0.5 right-0.5 block w-5 h-5 rounded-full bg-emerald-500 ring-2 ring-card" />

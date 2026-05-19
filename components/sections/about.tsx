@@ -3,33 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { ArrowUpRight, BrainCircuit, Building2, Code2 } from 'lucide-react';
-
-const containerVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: (delay: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, delay, ease: [0.25, 0.1, 0.25, 1] },
-  }),
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (delay: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, delay },
-  }),
-};
+import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 const highlights = [
   {
@@ -52,6 +26,34 @@ const highlights = [
 export function AboutSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.25 });
+  const { duration, durationFast } = useAnimationConfig();
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration, ease: [0.25, 0.1, 0.25, 1] },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: (delay: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration, delay, ease: [0.25, 0.1, 0.25, 1] },
+    }),
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (delay: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: durationFast, delay },
+    }),
+  };
 
   return (
     // ✅ FIX 1: Use variants consistently — no mixed initial/animate + variants
@@ -121,7 +123,7 @@ export function AboutSection() {
                   custom={0.3 + index * 0.08}
                   initial="hidden"
                   animate={isInView ? 'visible' : 'hidden'}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  whileHover={{ y: -4, transition: { duration: durationFast * 0.5 } }}
                   className="group relative overflow-hidden rounded-2xl border border-border bg-secondary/30 p-6 hover:border-primary/20 hover:bg-secondary/50">
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/[0.05] to-transparent" />
                   <div className="relative">

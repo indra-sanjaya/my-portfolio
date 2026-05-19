@@ -6,18 +6,7 @@ import { ArrowUpRight, Github } from 'lucide-react';
 
 import { ProjectDetailModal } from '@/components/projects/project-detail-modal';
 import { projectsData, type ProjectData } from '@/lib/projects-data';
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.7,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  },
-};
+import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 /* -------------------------
    Unified Button Style
@@ -32,6 +21,19 @@ const outlineButton = `${baseButton} border border-border text-foreground hover:
 function ProjectCard({ project, index }: { project: ProjectData; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.25 });
+  const { duration } = useAnimationConfig();
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration,
+        ease: [0.25, 0.1, 0.25, 1],
+      },
+    },
+  };
 
   const highlights = project.features.slice(0, 3);
 
@@ -100,7 +102,7 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
           transition
           hover:scale-[1.03]
           hover:shadow-sm
-          ${colorClass} text-black!
+          ${colorClass}
         `}>
                     {tech}
                   </span>
@@ -142,6 +144,7 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
 export function ProjectsSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const { duration, durationFast } = useAnimationConfig();
 
   return (
     <motion.section
@@ -149,14 +152,14 @@ export function ProjectsSection() {
       ref={ref}
       className="py-32 px-6 scroll-mt-28"
       initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7 }}>
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      transition={{ duration }}>
       <div className="max-w-6xl mx-auto">
         {/* HEADER */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: durationFast }}
           className="mb-16">
           <span className="text-xs tracking-widest uppercase text-muted-foreground">Selected Work</span>
           <h2 className="mt-5 text-5xl md:text-6xl font-bold tracking-tight leading-tight text-foreground">Projects</h2>

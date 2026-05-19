@@ -12,6 +12,29 @@ export const metadata: Metadata = {
   description:
     'Software Developer with engineering background building scalable systems that solve real-world problems.',
   generator: 'v0.app',
+  metadataBase: new URL('https://indrasanjaya.dev'),
+  openGraph: {
+    type: 'website',
+    url: 'https://indrasanjaya.dev',
+    title: 'Indra Sanjaya | Software Developer',
+    description:
+      'Software Developer with engineering background building scalable systems that solve real-world problems.',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Indra Sanjaya — Software Developer Portfolio',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Indra Sanjaya | Software Developer',
+    description:
+      'Software Developer with engineering background building scalable systems that solve real-world problems.',
+    images: ['/og-image.png'],
+  },
   icons: {
     icon: [
       {

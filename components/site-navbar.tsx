@@ -81,7 +81,7 @@ export function SiteNavbar() {
         'fixed top-4 left-1/2 z-50 w-[min(95vw,980px)] -translate-x-1/2 transition-all duration-500',
         visible ? 'translate-y-0 opacity-100' : '-translate-y-6 opacity-0 pointer-events-none',
       ].join(' ')}>
-      <div className="rounded-2xl border border-border/70 bg-background/82 backdrop-blur-xl shadow-[0_12px_60px_-30px_var(--foreground)]">
+      <div className="rounded-2xl border border-border/70 bg-background/80 backdrop-blur-xl shadow-[0_12px_60px_-30px_var(--foreground)]">
         <div className="flex items-center gap-2 p-2">
           <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {NAV_ITEMS.map((item) => {
@@ -92,6 +92,7 @@ export function SiteNavbar() {
                   key={item.id}
                   type="button"
                   onClick={() => scrollToId(item.id)}
+                  aria-current={active ? 'location' : undefined}
                   className={[
                     'whitespace-nowrap rounded-xl px-3 py-2 text-xs font-medium tracking-wide transition-colors',
                     active ?

@@ -63,15 +63,23 @@ function SectionNav() {
     { id: 'architecture', label: 'Architecture' },
   ];
 
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="sticky top-16 z-40 mb-10 hidden md:flex gap-2 overflow-x-auto rounded-full border border-border/40 bg-background/60 p-2 backdrop-blur-xl">
       {items.map((item) => (
-        <a
+        <button
           key={item.id}
-          href={`#${item.id}`}
+          type="button"
+          onClick={() => scrollTo(item.id)}
           className="rounded-full px-4 py-1 text-sm text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition">
           {item.label}
-        </a>
+        </button>
       ))}
     </div>
   );

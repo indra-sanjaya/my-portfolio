@@ -3,6 +3,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Award, ExternalLink, CalendarDays, BadgeCheck } from 'lucide-react';
+import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 const certifications = [
   {
@@ -46,6 +47,7 @@ const certifications = [
 
 export function CertificationsSection() {
   const ref = useRef(null);
+  const { duration, durationFast } = useAnimationConfig();
 
   const isInView = useInView(ref, {
     once: true,
@@ -57,15 +59,18 @@ export function CertificationsSection() {
       id="certifications"
       ref={ref}
       className="py-28 px-6 border-t border-border scroll-mt-28"
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7 }}>
+      initial="hidden"
+      animate={isInView ? 'visible' : 'hidden'}
+      variants={{
+        hidden: { opacity: 0, y: 40 },
+        visible: { opacity: 1, y: 0, transition: { duration, ease: [0.25, 0.1, 0.25, 1] } },
+      }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.1 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ delay: 0.1, duration: durationFast }}
           className="mb-14">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
@@ -94,9 +99,9 @@ export function CertificationsSection() {
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 24 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
               transition={{
-                duration: 0.5,
+                duration: durationFast,
                 delay: 0.15 + index * 0.07,
               }}
               className={`
@@ -107,7 +112,7 @@ export function CertificationsSection() {
                 hover:shadow-[0_15px_45px_-15px_rgba(56,189,248,0.25)]
                 ${
                   cert.featured ?
-                    'bg-gradient-to-white from-primary/10 to-secondary border-primary/20 md:col-span-2'
+                    'bg-gradient-to-br from-primary/10 to-secondary border-primary/20 md:col-span-2'
                   : 'bg-secondary/30 border-border'
                 }
               `}>
