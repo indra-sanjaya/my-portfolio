@@ -2,7 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Mail, Linkedin, Github, ArrowUpRight } from 'lucide-react';
+import { Mail, Linkedin, Github, ArrowUpRight, Instagram } from 'lucide-react';
 
 const links = [
   {
@@ -16,6 +16,12 @@ const links = [
     href: 'https://www.linkedin.com/in/indra-sanjaya-dev',
     icon: Linkedin,
     value: 'Connect',
+  },
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/indra_isanjaya',
+    icon: Instagram,
+    value: 'Follow',
   },
   {
     label: 'GitHub',
@@ -77,7 +83,9 @@ export function ContactSection() {
                 custom={index}
                 initial="hidden"
                 animate={isInView ? 'visible' : 'hidden'}
-                className="group flex items-center justify-between p-5 bg-background border border-border rounded-2xl transition-all duration-300 hover:border-muted-foreground/40">
+                className="group flex items-center justify-between p-5 bg-background border border-border rounded-2xl transition-all duration-300 hover:border-muted-foreground/40 hover:-translate-y-1
+                hover:border-primary/30
+                hover:shadow-2xl">
                 <div className="flex items-center gap-4">
                   <div className="p-2.5 bg-secondary rounded-xl group-hover:bg-secondary/80 transition-colors duration-300">
                     <link.icon className="w-5 h-5 text-foreground" />

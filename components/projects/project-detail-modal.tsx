@@ -99,7 +99,9 @@ export function ProjectDetailModal({ project }: ProjectDetailModalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="rounded-full px-5 py-2.5">
+        <Button
+          variant="secondary"
+          className="rounded-full px-6.5 py-2.5 hover:scale-110 hover:shadow-md transition-all duration-200">
           View Details
         </Button>
       </DialogTrigger>

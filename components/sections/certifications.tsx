@@ -2,25 +2,43 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Award } from 'lucide-react';
-import { title } from 'process';
+import { Award, ExternalLink, CalendarDays, BadgeCheck } from 'lucide-react';
 
 const certifications = [
   {
     title: 'Full Stack JavaScript Immersive Program',
+    issuer: 'Hacktiv8',
     earnedOn: 'April 2026',
+    featured: true,
     link: 'https://drive.google.com/file/d/1Bl10C-ROPCSAk6DMyp31EVEP_DJDshs4/view?usp=drive_link',
   },
   {
     title: 'Software Engineer Intern',
+    issuer: 'HackerRank',
     earnedOn: 'March 2026',
     link: 'https://www.hackerrank.com/certificates/00e98616eead',
   },
-  { title: 'JavaScript (Basic)', earnedOn: 'March 2026', link: 'https://www.hackerrank.com/certificates/818911bb4e26' },
-  { title: 'React (Basic)', earnedOn: 'March 2026', link: 'https://www.hackerrank.com/certificates/ebbcb4f5b143' },
-  { title: 'CSS (Basic)', earnedOn: 'March 2026', link: 'https://www.hackerrank.com/certificates/40d50e92e728' },
+  {
+    title: 'JavaScript (Basic)',
+    issuer: 'HackerRank',
+    earnedOn: 'March 2026',
+    link: 'https://www.hackerrank.com/certificates/818911bb4e26',
+  },
+  {
+    title: 'React (Basic)',
+    issuer: 'HackerRank',
+    earnedOn: 'March 2026',
+    link: 'https://www.hackerrank.com/certificates/ebbcb4f5b143',
+  },
+  {
+    title: 'CSS (Basic)',
+    issuer: 'HackerRank',
+    earnedOn: 'March 2026',
+    link: 'https://www.hackerrank.com/certificates/40d50e92e728',
+  },
   {
     title: 'Problem Solving (Basic)',
+    issuer: 'HackerRank',
     earnedOn: 'March 2026',
     link: 'https://www.hackerrank.com/certificates/50443addb6f4',
   },
@@ -28,48 +46,111 @@ const certifications = [
 
 export function CertificationsSection() {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+
+  const isInView = useInView(ref, {
+    once: true,
+    amount: 0.2,
+  });
 
   return (
     <motion.section
       id="certifications"
-      className="py-24 px-6 border-t border-border scroll-mt-28"
       ref={ref}
+      className="py-28 px-6 border-t border-border scroll-mt-28"
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}>
-      <div className="max-w-5xl mx-auto">
+      transition={{ duration: 0.7 }}>
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-          className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-secondary rounded-xl">
-              <Award className="w-5 h-5 text-muted-foreground" />
+          transition={{ delay: 0.1 }}
+          className="mb-14">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
+              <Award className="w-6 h-6 text-primary" />
             </div>
+
             <div>
-              <h3 className="text-lg font-medium text-foreground">HackerRank Certifications</h3>
-              <p className="text-sm text-muted-foreground">Verified skill assessments</p>
+              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Certifications</p>
+
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Verified Skills & Achievements</h2>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {certifications.map((cert, index) => (
-              <motion.a
-                key={cert.title}
-                href={cert.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.5, delay: 0.2 + index * 0.06, ease: [0.25, 0.1, 0.25, 1] }}
-                className="px-4 py-2 text-sm text-muted-foreground bg-secondary rounded-full hover:bg-primary hover:text-primary-foreground transition-colors">
-                {cert.title} - <span className="text-xs">{cert.earnedOn}</span>
-              </motion.a>
-            ))}
-          </div>
+          <p className="text-muted-foreground max-w-2xl leading-8 text-base">
+            Certifications and assessments validating my technical skills, problem-solving ability, and full-stack
+            development experience.
+          </p>
         </motion.div>
+
+        {/* Cards */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {certifications.map((cert, index) => (
+            <motion.a
+              key={cert.title}
+              href={cert.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 24 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{
+                duration: 0.5,
+                delay: 0.15 + index * 0.07,
+              }}
+              className={`
+                group relative overflow-hidden rounded-3xl border
+                transition-all duration-300
+                hover:-translate-y-1
+                hover:border-blue-700
+                hover:shadow-[0_15px_45px_-15px_rgba(56,189,248,0.25)]
+                ${
+                  cert.featured ?
+                    'bg-gradient-to-white from-primary/10 to-secondary border-primary/20 md:col-span-2'
+                  : 'bg-secondary/30 border-border'
+                }
+              `}>
+              {/* Glow */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
+
+              <div className="relative p-7">
+                <div className="flex items-start justify-between gap-6">
+                  {/* Left */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <BadgeCheck className="w-4 h-4 text-primary" />
+
+                      <span className="text-sm text-muted-foreground font-medium">{cert.issuer}</span>
+                    </div>
+
+                    <div>
+                      <h3
+                        className={`
+                          font-semibold leading-tight text-foreground
+                          ${cert.featured ? 'text-2xl md:text-3xl' : 'text-xl'}
+                        `}>
+                        {cert.title}
+                      </h3>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CalendarDays className="w-4 h-4" />
+                      <span>Earned {cert.earnedOn}</span>
+                    </div>
+                  </div>
+
+                  {/* Right */}
+                  <div className="shrink-0">
+                    <div className="w-11 h-11 rounded-2xl bg-background/80 border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                      <ExternalLink className="w-4 h-4" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.a>
+          ))}
+        </div>
       </div>
     </motion.section>
   );
