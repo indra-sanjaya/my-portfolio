@@ -62,6 +62,15 @@ const glowStyles = [
   'hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.30)]', // emerald
 ];
 
+const borderColors = [
+  'hover:border-green-400/30',
+  'hover:border-blue-400/30',
+  'hover:border-amber-400/30',
+  'hover:border-slate-300/30',
+  'hover:border-purple-400/30',
+  'hover:border-emerald-400/30',
+];
+
 const iconColors = [
   'text-green-400',
   'text-blue-400',
@@ -134,7 +143,7 @@ export function ImpactSection() {
                 className={`
   group relative
   bg-card
-  border border-border/50
+  border border-border/100 border-2
   rounded-3xl
   p-8 md:p-10
   transition-all duration-300
@@ -142,6 +151,7 @@ export function ImpactSection() {
   hover:border-border
   hover:-translate-y-1
   ${glowStyles[index]}
+  ${borderColors[index]}
 `}>
                 {/* ICON */}
                 <div className="mb-6 inline-flex items-center justify-center w-11 h-11 rounded-xl bg-secondary/60 border border-border/40">

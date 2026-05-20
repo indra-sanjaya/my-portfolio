@@ -55,7 +55,7 @@ export function SiteNavbar() {
     setMounted(true);
 
     const onScroll = () => {
-      setVisible(window.scrollY > 160);
+      setVisible(window.scrollY > 10);
       setActiveSection(getActiveSection());
     };
 
@@ -81,12 +81,56 @@ export function SiteNavbar() {
         'fixed top-4 left-1/2 z-50 w-[min(95vw,980px)] -translate-x-1/2 transition-all duration-500',
         visible ? 'translate-y-0 opacity-100' : '-translate-y-6 opacity-0 pointer-events-none',
       ].join(' ')}>
-      <div className="rounded-2xl border border-border/70 bg-blue-300 backdrop-blur-xl shadow-[0_12px_60px_-30px_var(--foreground)]">
-        <div className="flex items-center gap-2 p-2">
+      {/* Glass card */}
+      <div
+        className="rounded-2xl relative overflow-hidden"
+        style={{
+          background:
+            'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.10) 100%)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          border: '1px solid rgba(255,255,255,0.35)',
+          boxShadow: `
+        0 12px 60px -30px rgba(0,0,0,0.4),
+        0 0 0 0.5px rgba(255,255,255,0.12) inset,
+        0 1.5px 0 rgba(255,255,255,0.55) inset,
+        0 -1px 0 rgba(255,255,255,0.08) inset,
+        2px 0 0 rgba(255,255,255,0.1) inset
+      `,
+        }}>
+        {/* Top specular highlight */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-[45%] rounded-t-2xl z-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 60%, transparent 100%)',
+          }}
+        />
+
+        {/* Prismatic shimmer streak */}
+        <div
+          className="pointer-events-none absolute -top-10 -left-10 w-[60%] h-[55%] -rotate-[30deg] opacity-20 z-0"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 40%, rgba(200,230,255,0.6) 55%, transparent)',
+            filter: 'blur(6px)',
+          }}
+        />
+
+        {/* Bottom inner reflection line */}
+        <div
+          className="pointer-events-none absolute inset-x-4 bottom-0 h-px z-0"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent, rgba(255,255,255,0.15) 30%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.15) 70%, transparent)',
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 flex items-center gap-2 p-2">
           <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {NAV_ITEMS.map((item) => {
               const active = item.id === activeSection;
-
               return (
                 <button
                   key={item.id}
@@ -96,7 +140,7 @@ export function SiteNavbar() {
                     'whitespace-nowrap rounded-xl px-3 py-2 text-xs font-medium tracking-wide transition-colors',
                     active ?
                       'bg-foreground text-background'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+                    : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
                   ].join(' ')}>
                   {item.label}
                 </button>
@@ -107,7 +151,11 @@ export function SiteNavbar() {
           <button
             type="button"
             onClick={() => setTheme(isLight ? 'dark' : 'light')}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-secondary"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-foreground transition-colors hover:bg-white/10"
+            style={{
+              border: '1px solid rgba(255,255,255,0.25)',
+              background: 'rgba(255,255,255,0.08)',
+            }}
             aria-label="Toggle color theme">
             {isLight ?
               <Moon className="h-4 w-4" />
