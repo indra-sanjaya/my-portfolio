@@ -16,6 +16,55 @@ const certifications = [
     link: 'https://drive.google.com/file/d/1Bl10C-ROPCSAk6DMyp31EVEP_DJDshs4/view?usp=drive_link',
   },
   {
+    title: 'SQL (Advanced)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/6ecace69865f',
+  },
+  {
+    title: 'Rest API (Intermediate)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/b67cbaf726cb',
+  },
+  {
+    title: 'JavaScript (Intermediate)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/c0e95b30ffc1',
+  },
+  {
+    title: 'Problem Solving (Intermediate)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/5cac421a558f',
+  },
+  {
+    title: 'Node.js (Intermediate)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/4a29ef02a7f6',
+  },
+  {
+    title: 'SQL (Intermediate)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/8c62e336524a',
+  },
+  {
+    title: 'SQL (Basic)',
+    issuer: 'HackerRank',
+    logo: '/hackerrank-logo.png',
+    earnedOn: 'May 2026',
+    link: 'https://www.hackerrank.com/certificates/a4780dc2fe53',
+  },
+  {
     title: 'Frontend Developer (React)',
     issuer: 'HackerRank',
     logo: '/hackerrank-logo.png',
@@ -28,13 +77,6 @@ const certifications = [
     logo: '/hackerrank-logo.png',
     earnedOn: 'May 2026',
     link: 'https://www.hackerrank.com/certificates/9c865a0b35ff',
-  },
-  {
-    title: 'Rest API (Intermediate)',
-    issuer: 'HackerRank',
-    logo: '/hackerrank-logo.png',
-    earnedOn: 'May 2026',
-    link: 'https://www.hackerrank.com/certificates/b67cbaf726cb',
   },
   {
     title: 'Software Engineer Intern',
@@ -136,11 +178,10 @@ export function CertificationsSection() {
         </motion.div>
 
         {/* Cards */}
-        <motion.div layout className="grid md:grid-cols-2 gap-6">
+        <motion.div className="grid md:grid-cols-2 gap-6">
           <AnimatePresence>
             {visibleCertifications.map((cert, index) => (
               <motion.a
-                layout
                 key={cert.title}
                 href={cert.link}
                 target="_blank"

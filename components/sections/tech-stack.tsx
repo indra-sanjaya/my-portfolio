@@ -326,7 +326,6 @@ export function TechStackSection() {
 
               return (
                 <motion.div
-                  layout
                   key={category.title}
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -422,7 +421,6 @@ export function TechStackSection() {
                   <AnimatePresence>
                     {isExpanded && (
                       <motion.div
-                        layout
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
