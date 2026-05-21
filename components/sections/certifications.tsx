@@ -1,8 +1,9 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { Award, ExternalLink, CalendarDays, BadgeCheck } from 'lucide-react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { Award, ExternalLink, CalendarDays, BadgeCheck, ChevronDown, ChevronUp } from 'lucide-react';
+
 import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 const certifications = [
@@ -74,12 +75,19 @@ const certifications = [
 
 export function CertificationsSection() {
   const ref = useRef(null);
+
   const { duration, durationFast } = useAnimationConfig();
 
   const isInView = useInView(ref, {
     once: true,
     amount: 0.2,
   });
+
+  const [showAll, setShowAll] = useState(false);
+
+  const visibleCertifications = showAll ? certifications : certifications.slice(0, 3);
+
+  const remainingCount = certifications.length - 3;
 
   return (
     <motion.section
@@ -90,14 +98,24 @@ export function CertificationsSection() {
       animate={isInView ? 'visible' : 'hidden'}
       variants={{
         hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration, ease: [0.25, 0.1, 0.25, 1] } },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: {
+            duration,
+            ease: [0.25, 0.1, 0.25, 1],
+          },
+        },
       }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ delay: 0.1, duration: durationFast }}
+          transition={{
+            delay: 0.1,
+            duration: durationFast,
+          }}
           className="mb-14">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
@@ -118,75 +136,123 @@ export function CertificationsSection() {
         </motion.div>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {certifications.map((cert, index) => (
-            <motion.a
-              key={cert.title}
-              href={cert.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 24 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-              transition={{
-                duration: durationFast,
-                delay: 0.15 + index * 0.07,
-              }}
-              className={`
-                group relative overflow-hidden rounded-3xl border
-                transition-all duration-300
-                hover:-translate-y-1
-                hover:border-blue-700
-                hover:shadow-[0_15px_45px_-15px_rgba(56,189,248,0.25)]
-                ${
-                  cert.featured ?
-                    'bg-gradient-to-br from-primary/10 to-secondary border-primary/20 md:col-span-2'
-                  : 'bg-secondary/30 border-border'
-                }
-              `}>
-              {/* Glow */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
+        <motion.div layout className="grid md:grid-cols-2 gap-6">
+          <AnimatePresence>
+            {visibleCertifications.map((cert, index) => (
+              <motion.a
+                layout
+                key={cert.title}
+                href={cert.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{
+                  duration: durationFast,
+                  delay: index * 0.05,
+                }}
+                className={`
+                  group relative overflow-hidden rounded-3xl border
+                  transition-all duration-300
+                  hover:-translate-y-1
+                  hover:border-blue-700
+                  hover:shadow-[0_15px_45px_-15px_rgba(56,189,248,0.25)]
+                  ${
+                    cert.featured ?
+                      'bg-gradient-to-br from-primary/10 to-secondary border-primary/20 md:col-span-2'
+                    : 'bg-secondary/30 border-border'
+                  }
+                `}>
+                {/* Hover Glow */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
 
-              <div className="relative p-7">
-                <div className="flex items-start justify-between gap-6">
-                  {/* Left */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={cert.logo}
-                        alt={`${cert.issuer} logo`}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
+                <div className="relative p-7">
+                  <div className="flex items-start justify-between gap-6">
+                    {/* Left */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={cert.logo}
+                          alt={`${cert.issuer} logo`}
+                          className="w-10 h-10 rounded-full object-cover border border-border"
+                        />
 
-                      <span className="text-sm text-muted-foreground font-large">{cert.issuer}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground font-medium">{cert.issuer}</span>
+
+                          {cert.featured && (
+                            <div className="flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[11px] text-primary">
+                              <BadgeCheck className="w-3 h-3" />
+                              Featured
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3
+                          className={`
+                            font-semibold leading-tight text-foreground
+                            ${cert.featured ? 'text-2xl md:text-3xl' : 'text-xl'}
+                          `}>
+                          {cert.title}
+                        </h3>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <CalendarDays className="w-4 h-4" />
+                        <span>Earned {cert.earnedOn}</span>
+                      </div>
                     </div>
 
-                    <div>
-                      <h3
-                        className={`
-                          font-semibold leading-tight text-foreground
-                          ${cert.featured ? 'text-2xl md:text-3xl' : 'text-xl'}
-                        `}>
-                        {cert.title}
-                      </h3>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CalendarDays className="w-4 h-4" />
-                      <span>Earned {cert.earnedOn}</span>
-                    </div>
-                  </div>
-
-                  {/* Right */}
-                  <div className="shrink-0">
-                    <div className="w-11 h-11 rounded-2xl bg-background/80 border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                      <ExternalLink className="w-4 h-4" />
+                    {/* Right */}
+                    <div className="shrink-0">
+                      <div className="w-11 h-11 rounded-2xl bg-background/80 border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
+                        <ExternalLink className="w-4 h-4" />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </motion.a>
-          ))}
-        </div>
+              </motion.a>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Expand / Collapse */}
+        {certifications.length > 3 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{
+              delay: 0.4,
+              duration: durationFast,
+            }}
+            className="flex justify-center mt-10">
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="
+                group inline-flex items-center gap-3
+                rounded-2xl border border-border
+                bg-secondary/40 backdrop-blur-sm
+                px-6 py-3
+                text-sm font-medium text-muted-foreground
+                transition-all duration-300
+                hover:border-primary/30
+                hover:bg-primary/5
+                hover:text-foreground
+                hover:shadow-lg
+              ">
+              <BadgeCheck className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+
+              <span>{showAll ? 'Show Less Certifications' : `See ${remainingCount} More Certifications`}</span>
+
+              {showAll ?
+                <ChevronUp className="w-4 h-4 transition-transform duration-300" />
+              : <ChevronDown className="w-4 h-4 transition-transform duration-300" />}
+            </button>
+          </motion.div>
+        )}
       </div>
     </motion.section>
   );

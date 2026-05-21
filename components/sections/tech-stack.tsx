@@ -1,7 +1,8 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useMemo, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { useRef, useState } from 'react';
+
 import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 import {
@@ -26,11 +27,27 @@ import {
 } from 'react-icons/si';
 
 import { FaUserLock, FaMobileAlt, FaBoxes } from 'react-icons/fa';
+
 import { MdOutlineAccountBox } from 'react-icons/md';
+
 import { LiaReact } from 'react-icons/lia';
+
 import { IoIosLock } from 'react-icons/io';
 
-import { Sparkles, BrainCircuit, Bot, DatabaseZap, Layers3 } from 'lucide-react';
+import {
+  Sparkles,
+  BrainCircuit,
+  Bot,
+  DatabaseZap,
+  Layers3,
+  ChevronDown,
+  BadgeCheck,
+  Code2,
+  Database,
+  ShieldCheck,
+  Smartphone,
+  Brain,
+} from 'lucide-react';
 
 type Tech = {
   name: string;
@@ -41,6 +58,9 @@ type Tech = {
 type Category = {
   title: string;
   description: string;
+  featured?: boolean;
+  categoryIcon: React.ReactNode;
+  categoryIconColor: string;
   technologies: Tech[];
 };
 
@@ -48,6 +68,8 @@ const categories: Category[] = [
   {
     title: 'Languages',
     description: 'Core programming languages used across frontend and backend development.',
+    categoryIcon: <Code2 className="w-6 h-6" />,
+    categoryIconColor: '#F59E0B',
     technologies: [
       {
         name: 'JavaScript',
@@ -65,6 +87,8 @@ const categories: Category[] = [
   {
     title: 'Frontend',
     description: 'Modern UI frameworks and styling technologies for responsive applications.',
+    categoryIcon: <SiReact className="w-6 h-6" />,
+    categoryIconColor: '#38BDF8',
     technologies: [
       {
         name: 'React',
@@ -86,7 +110,9 @@ const categories: Category[] = [
 
   {
     title: 'Backend & APIs',
-    description: 'Server-side technologies, APIs, and scalable application architecture.',
+    description: 'Server-side technologies, APIs, and scalable architecture.',
+    categoryIcon: <SiNodedotjs className="w-6 h-6" />,
+    categoryIconColor: '#22C55E',
     technologies: [
       {
         name: 'Node.js',
@@ -114,6 +140,8 @@ const categories: Category[] = [
   {
     title: 'Databases & ORM',
     description: 'Database technologies and data management tools.',
+    categoryIcon: <Database className="w-6 h-6" />,
+    categoryIconColor: '#8B5CF6',
     technologies: [
       {
         name: 'PostgreSQL',
@@ -141,6 +169,8 @@ const categories: Category[] = [
   {
     title: 'Authentication & Security',
     description: 'Authentication systems and application security practices.',
+    categoryIcon: <ShieldCheck className="w-6 h-6" />,
+    categoryIconColor: '#EF4444',
     technologies: [
       {
         name: 'bcryptjs',
@@ -163,6 +193,8 @@ const categories: Category[] = [
   {
     title: 'Mobile Development',
     description: 'Cross-platform mobile development and deployment tools.',
+    categoryIcon: <Smartphone className="w-6 h-6" />,
+    categoryIconColor: '#06B6D4',
     technologies: [
       {
         name: 'React Native',
@@ -194,7 +226,10 @@ const categories: Category[] = [
 
   {
     title: 'AI & LLM Integration',
+    featured: true,
     description: 'Tools and workflows used to build AI-powered applications and intelligent systems.',
+    categoryIcon: <Brain className="w-6 h-6" />,
+    categoryIconColor: '#A855F7',
     technologies: [
       {
         name: 'Gemini API',
@@ -247,12 +282,19 @@ const categories: Category[] = [
 
 export function TechStackSection() {
   const ref = useRef<HTMLDivElement | null>(null);
+
   const { duration, durationFast } = useAnimationConfig();
 
   const isInView = useInView(ref, {
     once: true,
     amount: 0.15,
   });
+
+  const [expandedCategories, setExpandedCategories] = useState<string[]>(['AI & LLM Integration']);
+
+  const handleExpand = (title: string) => {
+    setExpandedCategories((prev) => (prev.includes(title) ? prev.filter((item) => item !== title) : [...prev, title]));
+  };
 
   return (
     <section id="tech-stack" ref={ref} className="py-32 px-6 border-t border-border scroll-mt-28">
@@ -262,7 +304,7 @@ export function TechStackSection() {
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration }}
-          className="mb-20">
+          className="mb-16">
           <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground">Technologies</span>
 
           <h2 className="mt-5 text-4xl md:text-5xl font-bold tracking-tight text-foreground">
@@ -270,103 +312,192 @@ export function TechStackSection() {
           </h2>
 
           <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-3xl">
-            Technologies and tools I use to build modern full-stack and AI-powered applications, from responsive
-            interfaces and scalable APIs to intelligent chat systems and retrieval-based AI workflows.
+            Technologies and tools I use to build modern full-stack and AI-powered applications.
           </p>
         </motion.div>
-        {/* CATEGORY GRID */}
-        <div className="grid gap-8 md:grid-cols-2">
-          {categories.map((category, categoryIndex) => {
-            const isAI = category.title === 'AI & LLM Integration';
 
-            return (
-              <motion.div
-                key={category.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{
-                  duration: durationFast,
-                  delay: categoryIndex * 0.06,
-                }}
-                className={`
-          relative overflow-hidden
-          rounded-3xl border border-border
-          bg-card/50 backdrop-blur-sm
-          p-7 transition-all duration-300 hover:scale-110
-          ${isAI ? 'md:col-span-2' : ''}
-        `}>
-                {/* subtle glow */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-transparent pointer-events-none" />
+        {/* VERTICAL STACK */}
+        <div className="space-y-6">
+          <AnimatePresence>
+            {categories.map((category, categoryIndex) => {
+              const isExpanded = expandedCategories.includes(category.title);
 
-                {/* CATEGORY HEADER */}
-                <div className="relative mb-7">
-                  <h3 className="text-xl font-semibold text-foreground text-center justify-center">{category.title}</h3>
+              const isAI = category.title === 'AI & LLM Integration';
 
-                  <p className="mt-2 text-sm leading-7 text-muted-foreground">{category.description}</p>
-                </div>
+              return (
+                <motion.div
+                  layout
+                  key={category.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={isInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{
+                    duration: durationFast,
+                    delay: categoryIndex * 0.05,
+                  }}
+                  className={`
+                    relative overflow-hidden
+                    rounded-[2rem]
+                    border
+                    transition-all duration-500
+                    'border-border bg-card/60'
+                  `}>
+                  {/* Glow */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-transparent pointer-events-none" />
 
-                {/* TECH ITEMS */}
-                <div className="relative flex flex-wrap gap-3">
-                  {category.technologies.map((tech, index) => (
-                    <motion.div
-                      key={tech.name}
-                      initial={{ opacity: 0, scale: 0.96 }}
-                      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                      transition={{
-                        duration: durationFast,
-                        delay: categoryIndex * 0.06 + index * 0.025,
-                      }}
-                      whileHover={{ y: -3 }}
-                      className="group relative">
-                      {/* HOVER GLOW */}
-                      <div
-                        className="absolute inset-0 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"
-                        style={{
-                          background:
-                            tech.color === '#ffffff' ?
-                              'radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, transparent 70%)'
-                            : `radial-gradient(circle at center, ${tech.color} 0%, transparent 70%)`,
-                        }}
-                      />
-
-                      {/* CHIP */}
-                      <div
-                        className="
-                  relative
-                  flex items-center gap-3
-                  px-4 py-3
-                  rounded-2xl
-                  border border-border
-                  bg-background/70
-                  transition-all duration-300
-                  hover:border-white/10
-                  hover:shadow-lg
-                ">
-                        {/* ICON */}
+                  {/* HEADER */}
+                  <button
+                    onClick={() => handleExpand(category.title)}
+                    className="
+                      group relative w-full text-left
+                      p-7 md:p-8
+                    ">
+                    <div className="flex items-start justify-between gap-6">
+                      {/* LEFT */}
+                      <div className="flex items-start gap-5 flex-1 min-w-0">
+                        {/* CATEGORY ICON */}
                         <div
                           className="
-                    flex items-center justify-center
-                    w-9 h-9 rounded-xl
-                    border text-lg shrink-0
-                    transition-all duration-300 hover:scale-110
-                  "
+                            shrink-0
+                            flex items-center justify-center
+                            w-14 h-14 rounded-2xl border
+                            border-border bg-background/50 text-muted-foreground"
                           style={{
-                            color: tech.color === '#ffffff' ? 'hsl(var(--foreground))' : tech.color,
-                            backgroundColor: tech.color === '#ffffff' ? 'rgba(128,128,128,0.12)' : `${tech.color}15`,
-                            borderColor: tech.color === '#ffffff' ? 'rgba(128,128,128,0.2)' : `${tech.color}25`,
+                            borderColor: category.categoryIconColor + '25',
+                            backgroundColor: category.categoryIconColor + '15',
+                            color: category.categoryIconColor,
                           }}>
-                          {tech.icon}
+                          {category.categoryIcon}
                         </div>
 
-                        {/* NAME */}
-                        <span className="text-sm font-medium text-foreground whitespace-nowrap">{tech.name}</span>
+                        {/* TEXT */}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-3 mb-3">
+                            <h3 className="text-2xl font-semibold text-foreground">{category.title}</h3>
+
+                            {category.featured && (
+                              <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs text-primary">
+                                <BadgeCheck className="w-3 h-3" />
+                                Featured
+                              </div>
+                            )}
+                          </div>
+
+                          <p className="text-muted-foreground leading-7 max-w-3xl">{category.description}</p>
+
+                          <div className="flex items-center gap-3 mt-5 text-sm text-muted-foreground">
+                            <span>{category.technologies.length} Technologies</span>
+
+                            {!isExpanded && (
+                              <>
+                                <span className="opacity-30">•</span>
+
+                                <span>Click to expand</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            );
-          })}
+
+                      {/* RIGHT */}
+                      <div
+                        className={`
+                          shrink-0
+                          flex items-center justify-center
+                          w-12 h-12 rounded-2xl
+                          border border-border
+                          bg-background/60
+                          transition-all duration-300
+                          ${
+                            isExpanded ?
+                              'rotate-180 border-primary/20 bg-primary/10 text-primary'
+                            : 'group-hover:border-primary/20 group-hover:bg-primary/5'
+                          }
+                        `}>
+                        <ChevronDown className="w-5 h-5" />
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* EXPANDED */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        layout
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: durationFast }}
+                        className="px-7 md:px-8 pb-8">
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {category.technologies.map((tech, index) => (
+                            <motion.div
+                              key={tech.name}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{
+                                duration: durationFast,
+                                delay: index * 0.03,
+                              }}
+                              whileHover={{ y: -3 }}
+                              className="group relative">
+                              {/* Glow */}
+                              <div
+                                className="absolute inset-0 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-500"
+                                style={{
+                                  background:
+                                    tech.color === '#ffffff' ?
+                                      'radial-gradient(circle at center, rgba(255,255,255,0.12) 0%, transparent 70%)'
+                                    : `radial-gradient(circle at center, ${tech.color}35 0%, transparent 70%)`,
+                                }}
+                              />
+
+                              {/* TECH CARD */}
+                              <div
+                                className="
+                                  relative
+                                  flex items-center gap-4
+                                  rounded-3xl
+                                  border border-border
+                                  bg-background/60
+                                  px-5 py-5
+                                  transition-all duration-300
+                                  hover:border-white/10
+                                  hover:bg-background/80
+                                  hover:shadow-xl
+                                ">
+                                {/* ICON */}
+                                <div
+                                  className="
+                                    flex items-center justify-center
+                                    w-14 h-14 rounded-2xl
+                                    border text-2xl shrink-0
+                                  "
+                                  style={{
+                                    color: tech.color === '#ffffff' ? 'hsl(var(--foreground))' : tech.color,
+                                    backgroundColor:
+                                      tech.color === '#ffffff' ? 'rgba(128,128,128,0.12)' : `${tech.color}15`,
+                                    borderColor: tech.color === '#ffffff' ? 'rgba(128,128,128,0.2)' : `${tech.color}25`,
+                                  }}>
+                                  {tech.icon}
+                                </div>
+
+                                {/* INFO */}
+                                <div className="min-w-0">
+                                  <p className="text-base font-semibold text-foreground">{tech.name}</p>
+
+                                  <p className="text-sm text-muted-foreground mt-1">Technology Stack</p>
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       </div>
     </section>
