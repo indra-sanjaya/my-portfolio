@@ -19,7 +19,7 @@ function GridBackground() {
       />
       {/* Glow orb — top center */}
       <div
-        className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full"
+        className="absolute -top-32 left-1/2 -translate-x-1/2 w-[min(80vw,700px)] h-[min(60vw,520px)] rounded-full"
         style={{
           background: 'radial-gradient(ellipse at center, rgba(99,102,241,0.14) 0%, transparent 65%)',
           filter: 'blur(40px)',
@@ -27,7 +27,7 @@ function GridBackground() {
       />
       {/* Glow orb — bottom right accent */}
       <div
-        className="absolute bottom-0 right-0 w-[400px] h-[400px]"
+        className="absolute bottom-0 right-0 w-[min(60vw,420px)] h-[min(60vw,420px)]"
         style={{
           background: 'radial-gradient(ellipse at bottom right, rgba(6,182,212,0.08) 0%, transparent 65%)',
           filter: 'blur(60px)',
@@ -44,17 +44,19 @@ export function HeroSection() {
   const { duration, durationFast, durationSlow } = useAnimationConfig();
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center px-6 py-32 overflow-hidden">
+    <section
+      id="hero"
+      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden section-padding section-y">
       <GridBackground />
 
-      <div className="relative z-10 max-w-4xl mx-auto text-center">
+      <div className="relative z-10 mx-auto text-center max-w-[min(920px,92vw)]">
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration, ease: [0.16, 1, 0.3, 1] }}>
           <span
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 mb-8 text-xs tracking-widest uppercase rounded-full border font-medium"
+            className="inline-flex items-center gap-2.5 px-4 py-1.5 mb-7 text-xs tracking-widest uppercase rounded-full border font-medium"
             style={{
               color: 'rgb(34,211,238)',
               borderColor: 'rgba(34,211,238,0.25)',
@@ -73,7 +75,7 @@ export function HeroSection() {
 
         {/* Heading */}
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight text-foreground text-balance leading-[1.1]"
+          className="text-[clamp(2.15rem,6.6vw,4.75rem)] font-medium tracking-tight text-foreground text-balance leading-[1.05]"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: durationSlow, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}>
@@ -91,7 +93,7 @@ export function HeroSection() {
 
         {/* Subtitle */}
         <motion.p
-          className="mt-8 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+          className="mt-6 text-[clamp(1rem,2.2vw,1.25rem)] text-muted-foreground max-w-[min(640px,90vw)] mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: durationSlow, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
@@ -101,7 +103,7 @@ export function HeroSection() {
 
         {/* Skill pills */}
         <motion.div
-          className="mt-10 flex flex-wrap items-center justify-center gap-2"
+          className="mt-8 flex flex-wrap items-center justify-center gap-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: durationFast, delay: 0.35 }}>
@@ -123,13 +125,13 @@ export function HeroSection() {
 
         {/* CTAs */}
         <motion.div
-          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="mt-10 flex w-full flex-col items-stretch sm:flex-row sm:items-center sm:justify-center gap-3 sm:gap-4"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: durationSlow, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}>
           <a
             href="#projects"
-            className="group inline-flex items-center gap-2 px-8 py-4 rounded-full font-medium transition-all duration-300 hover:scale-[1.03] hover:brightness-110"
+            className="group inline-flex w-full items-center justify-center gap-2 px-7 py-3.5 rounded-full font-medium transition-all duration-300 hover:scale-[1.03] hover:brightness-110 sm:w-auto"
             style={{
               background: 'linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)',
               color: '#fff',
@@ -140,7 +142,7 @@ export function HeroSection() {
           </a>
           <a
             href="#contact"
-            className="inline-flex items-center gap-2 px-8 py-4 border border-border text-foreground rounded-full font-medium transition-all duration-300 hover:bg-secondary hover:border-transparent hover:scale-[1.02]">
+            className="inline-flex w-full items-center justify-center gap-2 px-7 py-3.5 border border-border text-foreground rounded-full font-medium transition-all duration-300 hover:bg-secondary hover:border-transparent hover:scale-[1.02] sm:w-auto">
             Get in Touch
           </a>
         </motion.div>
@@ -148,7 +150,7 @@ export function HeroSection() {
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: durationSlow }}>

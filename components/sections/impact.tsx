@@ -111,16 +111,16 @@ export function ImpactSection() {
     <motion.section
       id="impact"
       ref={ref}
-      className="py-32 px-6 scroll-mt-28"
+      className="section-y section-padding scroll-mt-28"
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       variants={sectionVariants}>
-      <div className="max-w-6xl mx-auto">
+      <div className="content-container">
         {/* HEADER */}
         <motion.div variants={itemVariants} custom={0} className="mb-16">
           <span className="text-xs tracking-widest uppercase text-muted-foreground">Engineering Impact</span>
 
-          <h2 className="mt-4 text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
+          <h2 className="mt-4 text-[clamp(2rem,4.6vw,3rem)] font-semibold tracking-tight text-foreground">
             Measurable Industrial Outcomes
           </h2>
 
@@ -131,7 +131,7 @@ export function ImpactSection() {
         </motion.div>
 
         {/* GRID */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
 
@@ -145,7 +145,7 @@ export function ImpactSection() {
   bg-card
   border border-border/100 border-2
   rounded-3xl
-  p-8 md:p-10
+  p-6 sm:p-8 md:p-10
   transition-all duration-300
   hover:bg-secondary/30
   hover:border-border
@@ -160,7 +160,7 @@ export function ImpactSection() {
 
                 {/* VALUE */}
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
+                  <span className="text-[clamp(2rem,4.6vw,3.1rem)] font-semibold tracking-tight text-foreground">
                     {metric.value}
                   </span>
                   <span className="text-sm text-muted-foreground">{metric.unit}</span>

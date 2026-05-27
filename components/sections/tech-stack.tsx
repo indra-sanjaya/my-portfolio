@@ -297,8 +297,8 @@ export function TechStackSection() {
   };
 
   return (
-    <section id="tech-stack" ref={ref} className="py-32 px-6 border-t border-border scroll-mt-28">
-      <div className="max-w-6xl mx-auto">
+    <section id="tech-stack" ref={ref} className="section-y section-padding border-t border-border scroll-mt-28">
+      <div className="content-container">
         {/* HEADER */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -307,11 +307,11 @@ export function TechStackSection() {
           className="mb-16">
           <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground">Technologies</span>
 
-          <h2 className="mt-5 text-4xl md:text-5xl font-bold tracking-tight text-foreground">
+          <h2 className="mt-4 text-[clamp(2rem,4.8vw,3.2rem)] font-bold tracking-tight text-foreground">
             Tech Stack & AI Integration
           </h2>
 
-          <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-3xl">
+          <p className="mt-5 text-[clamp(1rem,2.2vw,1.125rem)] leading-7 text-muted-foreground max-w-3xl">
             Technologies and tools I use to build modern full-stack and AI-powered applications.
           </p>
         </motion.div>
@@ -338,7 +338,7 @@ export function TechStackSection() {
                     rounded-[2rem]
                     border
                     transition-all duration-500
-                    'border-border bg-card/60'
+                    border-border bg-card/60
                   `}>
                   {/* Glow */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-transparent pointer-events-none" />
@@ -425,8 +425,8 @@ export function TechStackSection() {
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: durationFast }}
-                        className="px-7 md:px-8 pb-8">
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        className="px-6 sm:px-7 md:px-8 pb-7 sm:pb-8">
+                        <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
                           {category.technologies.map((tech, index) => (
                             <motion.div
                               key={tech.name}

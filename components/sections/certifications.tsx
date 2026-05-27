@@ -135,7 +135,7 @@ export function CertificationsSection() {
     <motion.section
       id="certifications"
       ref={ref}
-      className="py-28 px-6 border-t border-border scroll-mt-28"
+      className="section-y-tight section-padding border-t border-border scroll-mt-28"
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       variants={{
@@ -149,7 +149,7 @@ export function CertificationsSection() {
           },
         },
       }}>
-      <div className="max-w-6xl mx-auto">
+      <div className="content-container">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -167,7 +167,9 @@ export function CertificationsSection() {
             <div>
               <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Certifications</p>
 
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Verified Skills & Achievements</h2>
+              <h2 className="text-[clamp(1.9rem,4.2vw,2.5rem)] font-bold tracking-tight">
+                Verified Skills & Achievements
+              </h2>
             </div>
           </div>
 
@@ -178,7 +180,7 @@ export function CertificationsSection() {
         </motion.div>
 
         {/* Cards */}
-        <motion.div className="grid md:grid-cols-2 gap-6">
+        <motion.div className="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
           <AnimatePresence>
             {visibleCertifications.map((cert, index) => (
               <motion.a
@@ -201,7 +203,7 @@ export function CertificationsSection() {
                   hover:shadow-[0_15px_45px_-15px_rgba(56,189,248,0.25)]
                   ${
                     cert.featured ?
-                      'bg-gradient-to-br from-primary/10 to-secondary border-primary/20 md:col-span-2'
+                      'bg-gradient-to-br from-primary/10 to-secondary border-primary/20 sm:col-span-2'
                     : 'bg-secondary/30 border-border'
                   }
                 `}>

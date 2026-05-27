@@ -53,13 +53,13 @@ export function ContactSection() {
   return (
     <motion.section
       id="contact"
-      className="py-32 px-6 bg-card scroll-mt-28"
+      className="section-y section-padding bg-card scroll-mt-28"
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration, ease: [0.25, 0.1, 0.25, 1] }}>
-      <div className="max-w-5xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-16">
+      <div className="content-container">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -70,7 +70,7 @@ export function ContactSection() {
                 <img
                   src="/profile_picture.jpg"
                   alt="Indra Sanjaya"
-                  className="w-24 h-24 rounded-full object-cover object-top ring-2 ring-border"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover object-top ring-2 ring-border"
                   style={{ objectPosition: '50% 25%' }}
                 />
                 <span className="absolute bottom-0.5 right-0.5 block w-5 h-5 rounded-full bg-emerald-500 ring-2 ring-card" />
@@ -80,10 +80,10 @@ export function ContactSection() {
                 <p className="text-xs text-muted-foreground">Enthusiast, Optimist, Problem Solver and Curious Mind</p>
               </div>
             </div>
-            <h2 className="mt-4 text-4xl md:text-5xl font-medium tracking-tight text-foreground text-balance">
+            <h2 className="mt-4 text-[clamp(2rem,5.2vw,3.1rem)] font-medium tracking-tight text-foreground text-balance">
               Let&apos;s build something impactful
             </h2>
-            <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
+            <p className="mt-5 text-[clamp(1rem,2.3vw,1.125rem)] text-muted-foreground leading-relaxed">
               Open to discussing new opportunities, interesting projects, or just having a conversation about
               engineering and technology.
             </p>
@@ -100,16 +100,16 @@ export function ContactSection() {
                 custom={index}
                 initial="hidden"
                 animate={isInView ? 'visible' : 'hidden'}
-                className="group flex items-center justify-between p-5 bg-background border border-border rounded-2xl transition-all duration-300 hover:border-muted-foreground/40 hover:-translate-y-1
+                className="group flex items-center justify-between gap-4 p-4 sm:p-5 bg-background border border-border rounded-2xl transition-all duration-300 hover:border-muted-foreground/40 hover:-translate-y-1
                 hover:border-primary/30
                 hover:shadow-2xl">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 min-w-0">
                   <div className="p-2.5 bg-secondary rounded-xl group-hover:bg-secondary/80 transition-colors duration-300">
                     <link.icon className="w-5 h-5 text-foreground" />
                   </div>
                   <div>
                     <span className="text-xs text-muted-foreground uppercase tracking-wider">{link.label}</span>
-                    <p className="text-foreground font-medium">{link.value}</p>
+                    <p className="text-foreground font-medium break-words">{link.value}</p>
                   </div>
                 </div>
                 <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors duration-300" />

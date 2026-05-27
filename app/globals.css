@@ -133,8 +133,28 @@
       ),
       linear-gradient(to bottom, color-mix(in oklab, var(--background) 92%, var(--secondary) 8%), var(--background));
     min-height: 100vh;
+    overflow-x: hidden;
     transition:
       background-color 300ms ease,
       color 300ms ease;
+  }
+}
+
+@layer utilities {
+  .content-container {
+    width: min(1200px, 92vw);
+    margin-inline: auto;
+  }
+
+  .section-padding {
+    padding-inline: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  .section-y {
+    padding-block: clamp(4.5rem, 8vw, 8rem);
+  }
+
+  .section-y-tight {
+    padding-block: clamp(3.5rem, 6vw, 6.5rem);
   }
 }

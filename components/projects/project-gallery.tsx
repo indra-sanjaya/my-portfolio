@@ -36,7 +36,7 @@ export function ProjectGallery({
           <h4 className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">{titleText}</h4>
         </div>
         <div className="group relative overflow-hidden rounded-3xl border border-border/60 bg-muted/30 shadow-2xl shadow-black/10 transition-shadow duration-500 hover:shadow-black/20">
-          <div className="relative aspect-[16/9] w-full min-h-[280px] sm:min-h-[400px] lg:min-h-[500px]">
+          <div className="relative aspect-[16/9] w-full min-h-[clamp(220px,40vw,520px)]">
             <Image
               src={hero.src}
               alt={hero.alt}

@@ -78,7 +78,7 @@ export function PhilosophySection() {
       ref={ref}
       className="
         relative overflow-hidden
-        py-32 px-6
+        section-y section-padding
         bg-card
         border-t border-border
         scroll-mt-28
@@ -91,10 +91,10 @@ export function PhilosophySection() {
       }}>
       {/* subtle background glow */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/[0.04] blur-3xl rounded-full" />
+        <div className="absolute top-0 right-0 w-[min(55vw,520px)] h-[min(55vw,520px)] bg-primary/[0.04] blur-3xl rounded-full" />
       </div>
 
-      <div className="relative max-w-6xl mx-auto">
+      <div className="relative content-container">
         {/* HEADER */}
         <motion.div
           variants={itemVariants}
@@ -104,16 +104,18 @@ export function PhilosophySection() {
           className="mb-20">
           <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground">Philosophy</span>
 
-          <h2 className="mt-5 text-4xl md:text-5xl font-bold tracking-tight text-foreground">My Engineering Mindset</h2>
+          <h2 className="mt-4 text-[clamp(2rem,4.8vw,3.1rem)] font-bold tracking-tight text-foreground">
+            My Engineering Mindset
+          </h2>
 
-          <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-3xl">
+          <p className="mt-5 text-[clamp(1rem,2.3vw,1.125rem)] leading-7 text-muted-foreground max-w-3xl">
             Principles that shape how I approach software engineering, problem-solving, scalability, and building
             technology that creates meaningful impact.
           </p>
         </motion.div>
 
         {/* GRID */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
           {principles.map((principle, index) => (
             <motion.div
               key={principle.number}

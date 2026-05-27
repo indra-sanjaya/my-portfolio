@@ -117,7 +117,7 @@ export function ProjectDetailModal({ project }: ProjectDetailModalProps) {
       <DialogContent
         showCloseButton={false}
         className="
-          h-[100dvh]
+          min-h-[100dvh]
           w-screen
           max-w-none
           overflow-hidden
@@ -129,7 +129,7 @@ export function ProjectDetailModal({ project }: ProjectDetailModalProps) {
         <div className="h-full w-full overflow-y-auto">
           {/* HEADER */}
           <div className="sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl">
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 md:px-10">
+            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 md:px-10">
               <div className="flex items-center gap-4">
                 <DialogTitle className="text-xl font-semibold md:text-2xl">{project.title}</DialogTitle>
 
@@ -147,19 +147,19 @@ export function ProjectDetailModal({ project }: ProjectDetailModalProps) {
           </div>
 
           {/* CONTENT */}
-          <div className="mx-auto flex max-w-7xl flex-col gap-24 px-6 py-10 md:px-10 md:py-14">
+          <div className="mx-auto flex max-w-7xl flex-col gap-16 md:gap-24 px-4 py-10 sm:px-6 md:px-10 md:py-14">
             {/* HERO */}
             <section className="space-y-10">
               <div className="space-y-4">
-                <h2 className="text-4xl md:text-6xl font-semibold tracking-tight">{project.title}</h2>
+                <h2 className="text-[clamp(2rem,6vw,3.6rem)] font-semibold tracking-tight">{project.title}</h2>
 
-                <DialogDescription className="text-base md:text-lg text-muted-foreground leading-8">
+                <DialogDescription className="text-[clamp(1rem,2.2vw,1.125rem)] text-muted-foreground leading-7">
                   {project.fullDescription}
                 </DialogDescription>
               </div>
 
               <div className="overflow-hidden rounded-[32px] border border-border/50 bg-secondary/20">
-                <img src={heroImage.src} alt={heroImage.alt} className="h-[320px] md:h-[620px] w-full object-cover" />
+                <img src={heroImage.src} alt={heroImage.alt} className="w-full aspect-[16/9] object-cover" />
               </div>
             </section>
 

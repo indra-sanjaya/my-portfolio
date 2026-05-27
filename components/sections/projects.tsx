@@ -12,7 +12,7 @@ import { useAnimationConfig } from '@/hooks/use-animation-config';
    Unified Button Style
 -------------------------- */
 const baseButton =
-  'group inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 active:scale-95';
+  'group inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 active:scale-95';
 
 const primaryButton = `${baseButton} bg-foreground text-background hover:scale-110 hover:shadow-md transition-all duration-200`;
 
@@ -51,12 +51,12 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
           rounded-3xl
           border border-border
           bg-card
-          p-8 md:p-10
+          p-6 sm:p-8 md:p-10
           transition-all duration-500
           hover:border-border/60
           hover:bg-secondary/20
         ">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-10">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-10">
           {/* LEFT CONTENT */}
           <div className="flex-1 space-y-6">
             <div>
@@ -112,7 +112,7 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
           </div>
 
           {/* RIGHT ACTIONS */}
-          <div className="flex lg:flex-col gap-3 lg:items-end">
+          <div className="flex flex-wrap lg:flex-col gap-3 lg:items-end">
             {/* DETAILS (FIXED MODAL TRIGGER) */}
             <ProjectDetailModal project={project} />
 
@@ -150,11 +150,11 @@ export function ProjectsSection() {
     <motion.section
       id="projects"
       ref={ref}
-      className="py-32 px-6 scroll-mt-28"
+      className="section-y section-padding scroll-mt-28"
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
       transition={{ duration }}>
-      <div className="max-w-6xl mx-auto">
+      <div className="content-container">
         {/* HEADER */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -162,7 +162,9 @@ export function ProjectsSection() {
           transition={{ duration: durationFast }}
           className="mb-16">
           <span className="text-xs tracking-widest uppercase text-muted-foreground">Selected Work</span>
-          <h2 className="mt-5 text-5xl md:text-6xl font-bold tracking-tight leading-tight text-foreground">Projects</h2>
+          <h2 className="mt-4 text-[clamp(2.4rem,6vw,3.6rem)] font-bold tracking-tight leading-tight text-foreground">
+            Projects
+          </h2>
         </motion.div>
 
         {/* LIST */}

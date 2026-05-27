@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -49,6 +50,7 @@ export function SiteNavbar() {
   const [visible, setVisible] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [mounted, setMounted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
@@ -67,9 +69,20 @@ export function SiteNavbar() {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize);
 
+    const media = window.matchMedia('(min-width: 768px)');
+    const closeOnDesktop = () => {
+      if (media.matches) {
+        setMenuOpen(false);
+      }
+    };
+
+    closeOnDesktop();
+    media.addEventListener('change', closeOnDesktop);
+
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
+      media.removeEventListener('change', closeOnDesktop);
     };
   }, []);
 
@@ -78,7 +91,7 @@ export function SiteNavbar() {
   return (
     <div
       className={[
-        'fixed top-4 left-1/2 z-50 w-[min(95vw,980px)] -translate-x-1/2 transition-all duration-500',
+        'fixed top-3 sm:top-4 left-1/2 z-50 w-[min(96vw,1100px)] -translate-x-1/2 transition-all duration-500',
         visible ? 'translate-y-0 opacity-100' : '-translate-y-6 opacity-0 pointer-events-none',
       ].join(' ')}>
       {/* Glass card */}
@@ -128,7 +141,7 @@ export function SiteNavbar() {
 
         {/* Content */}
         <div className="relative z-10 flex items-center gap-2 p-2">
-          <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <nav className="hidden md:flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {NAV_ITEMS.map((item) => {
               const active = item.id === activeSection;
               return (
@@ -150,6 +163,38 @@ export function SiteNavbar() {
 
           <button
             type="button"
+            aria-label="Toggle navigation menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((prev) => !prev)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-foreground transition-colors hover:bg-white/10 md:hidden"
+            style={{
+              border: '1px solid rgba(255,255,255,0.25)',
+              background: 'rgba(255,255,255,0.08)',
+            }}>
+            <span className="relative block h-4 w-4">
+              <span
+                className={[
+                  'absolute left-0 top-0 h-0.5 w-4 rounded-full bg-current transition-transform duration-300',
+                  menuOpen ? 'translate-y-2 rotate-45' : 'translate-y-0',
+                ].join(' ')}
+              />
+              <span
+                className={[
+                  'absolute left-0 top-1.5 h-0.5 w-4 rounded-full bg-current transition-opacity duration-300',
+                  menuOpen ? 'opacity-0' : 'opacity-100',
+                ].join(' ')}
+              />
+              <span
+                className={[
+                  'absolute left-0 top-3 h-0.5 w-4 rounded-full bg-current transition-transform duration-300',
+                  menuOpen ? '-translate-y-1.5 -rotate-45' : 'translate-y-0',
+                ].join(' ')}
+              />
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setTheme(isLight ? 'dark' : 'light')}
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-foreground transition-colors hover:bg-white/10"
             style={{
@@ -162,6 +207,40 @@ export function SiteNavbar() {
             : <Sun className="h-4 w-4" />}
           </button>
         </div>
+
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden border-t border-white/10 px-3 pb-3">
+              <div className="grid gap-2 pt-3">
+                {NAV_ITEMS.map((item) => {
+                  const active = item.id === activeSection;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        scrollToId(item.id);
+                        setMenuOpen(false);
+                      }}
+                      className={[
+                        'rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors',
+                        active ?
+                          'bg-foreground text-background'
+                        : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
+                      ].join(' ')}>
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
