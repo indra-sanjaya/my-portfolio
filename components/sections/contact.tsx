@@ -2,7 +2,7 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Mail, Linkedin, Github, ArrowUpRight, Instagram } from 'lucide-react';
+import { Mail, Linkedin, Github, ArrowUpRight, Instagram, Download } from 'lucide-react';
 import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 const links = [
@@ -115,6 +115,26 @@ export function ContactSection() {
                 <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors duration-300" />
               </motion.a>
             ))}
+            {/* CV Download — pinned at top, visually distinct */}
+            <motion.a
+              href="/Indra_Sanjaya_CV.pdf"
+              download
+              variants={itemVariants}
+              custom={-1}
+              initial="hidden"
+              animate={isInView ? 'visible' : 'hidden'}
+              className="group flex items-center justify-between gap-4 p-4 sm:p-5 bg-foreground text-background rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:opacity-90 hover:shadow-2xl">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="p-2.5 bg-background/15 rounded-xl transition-colors duration-300">
+                  <Download className="w-5 h-5 text-background" />
+                </div>
+                <div>
+                  <span className="text-xs uppercase tracking-wider opacity-60">Resume</span>
+                  <p className="font-medium">Download CV</p>
+                </div>
+              </div>
+              <Download className="w-5 h-5 opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
+            </motion.a>
           </div>
         </div>
       </div>
