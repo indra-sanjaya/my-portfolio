@@ -2,29 +2,29 @@
 
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Home, User, TrendingUp, FolderKanban, Lightbulb, Layers, Award, Mail } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface NavItem {
   id: string;
   label: string;
+  icon: React.ElementType;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { id: 'hero', label: 'Home' },
-  { id: 'about', label: 'About' },
-  { id: 'impact', label: 'Impact' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'philosophy', label: 'Approach' },
-  { id: 'tech-stack', label: 'Stack' },
-  { id: 'certifications', label: 'Certifications' },
-  { id: 'contact', label: 'Contact' },
+  { id: 'hero', label: 'Home', icon: Home },
+  { id: 'about', label: 'About', icon: User },
+  { id: 'impact', label: 'Impact', icon: TrendingUp },
+  { id: 'projects', label: 'Projects', icon: FolderKanban },
+  { id: 'philosophy', label: 'Approach', icon: Lightbulb },
+  { id: 'tech-stack', label: 'Stack', icon: Layers },
+  { id: 'certifications', label: 'Certifications', icon: Award },
+  { id: 'contact', label: 'Contact', icon: Mail },
 ];
 
 function scrollToId(id: string) {
   const target = document.getElementById(id);
   if (!target) return;
-
   const top = target.getBoundingClientRect().top + window.scrollY - 96;
   window.scrollTo({ top, behavior: 'smooth' });
 }
@@ -36,11 +36,8 @@ function getActiveSection() {
   for (const item of NAV_ITEMS) {
     const section = document.getElementById(item.id);
     if (!section) continue;
-
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-    if (scrollPosition >= sectionTop) {
-      current = item.id;
-    }
+    if (scrollPosition >= sectionTop) current = item.id;
   }
 
   return current;
@@ -61,9 +58,7 @@ export function SiteNavbar() {
       setActiveSection(getActiveSection());
     };
 
-    const onResize = () => {
-      setActiveSection(getActiveSection());
-    };
+    const onResize = () => setActiveSection(getActiveSection());
 
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -71,11 +66,8 @@ export function SiteNavbar() {
 
     const media = window.matchMedia('(min-width: 768px)');
     const closeOnDesktop = () => {
-      if (media.matches) {
-        setMenuOpen(false);
-      }
+      if (media.matches) setMenuOpen(false);
     };
-
     closeOnDesktop();
     media.addEventListener('change', closeOnDesktop);
 
@@ -91,12 +83,12 @@ export function SiteNavbar() {
   return (
     <div
       className={[
-        'fixed top-3 sm:top-4 left-1/2 z-50 w-[min(96vw,1100px)] -translate-x-1/2 transition-all duration-500',
-        visible ? 'translate-y-0 opacity-100' : '-translate-y-6 opacity-0 pointer-events-none',
+        'fixed bottom-3 sm:bottom-4 left-1/2 z-50 w-[min(96vw,1100px)] -translate-x-1/2 transition-all duration-500',
+        visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0 pointer-events-none',
       ].join(' ')}>
       {/* Glass card */}
       <div
-        className="rounded-2xl relative overflow-hidden"
+        className="rounded-2xl relative"
         style={{
           background:
             'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 50%, rgba(255,255,255,0.10) 100%)',
@@ -104,33 +96,29 @@ export function SiteNavbar() {
           WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           border: '1px solid rgba(255,255,255,0.35)',
           boxShadow: `
-        0 12px 60px -30px rgba(0,0,0,0.4),
-        0 0 0 0.5px rgba(255,255,255,0.12) inset,
-        0 1.5px 0 rgba(255,255,255,0.55) inset,
-        0 -1px 0 rgba(255,255,255,0.08) inset,
-        2px 0 0 rgba(255,255,255,0.1) inset
-      `,
+            0 -12px 60px -30px rgba(0,0,0,0.4),
+            0 0 0 0.5px rgba(255,255,255,0.12) inset,
+            0 1.5px 0 rgba(255,255,255,0.55) inset,
+            0 -1px 0 rgba(255,255,255,0.08) inset,
+            2px 0 0 rgba(255,255,255,0.1) inset
+          `,
         }}>
-        {/* Top specular highlight */}
+        {/* Decorative highlights (unchanged) */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-[45%] rounded-t-2xl z-0"
+          className="pointer-events-none absolute inset-x-0 top-0 h-[45%] rounded-t-2xl z-0 overflow-hidden"
           style={{
             background:
               'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.06) 60%, transparent 100%)',
           }}
         />
-
-        {/* Prismatic shimmer streak */}
         <div
-          className="pointer-events-none absolute -top-10 -left-10 w-[60%] h-[55%] -rotate-[30deg] opacity-20 z-0"
+          className="pointer-events-none absolute -top-10 -left-10 w-[60%] h-[55%] -rotate-[30deg] opacity-20 z-0 overflow-hidden"
           style={{
             background:
               'linear-gradient(90deg, transparent, rgba(255,255,255,0.9) 40%, rgba(200,230,255,0.6) 55%, transparent)',
             filter: 'blur(6px)',
           }}
         />
-
-        {/* Bottom inner reflection line */}
         <div
           className="pointer-events-none absolute inset-x-4 bottom-0 h-px z-0"
           style={{
@@ -141,32 +129,95 @@ export function SiteNavbar() {
 
         {/* Content */}
         <div className="relative z-10 flex items-center gap-2 p-2">
-          <nav className="hidden md:flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pr-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {/* Desktop nav — full width, evenly spaced including theme button */}
+          <nav className="hidden md:flex w-full items-center justify-around">
             {NAV_ITEMS.map((item) => {
               const active = item.id === activeSection;
+              const Icon = item.icon;
               return (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => scrollToId(item.id)}
+                  aria-label={item.label}
                   className={[
-                    'whitespace-nowrap rounded-xl px-3 py-2 text-xs font-medium tracking-wide transition-colors',
+                    'group relative flex items-center justify-center rounded-xl p-2.5 transition-colors',
                     active ?
                       'bg-foreground text-background'
                     : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
                   ].join(' ')}>
-                  {item.label}
+                  <Icon className="h-[18px] w-[18px]" />
+
+                  {/* Floating label */}
+                  <span
+                    className="pointer-events-none absolute -top-11 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xl px-3 py-1.5 text-xs font-semibold tracking-wide invisible group-hover:visible"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 100%)',
+                      backdropFilter: 'blur(16px) saturate(180%)',
+                      WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                      border: '1px solid rgba(255,255,255,0.35)',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.25), 0 1px 0 rgba(255,255,255,0.4) inset',
+                      color: 'var(--foreground)',
+                    }}>
+                    {item.label}
+                    {/* small arrow pointing down */}
+                    <span
+                      className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 block h-2.5 w-2.5 rotate-45"
+                      style={{
+                        background: 'rgba(255,255,255,0.15)',
+                        border: '1px solid rgba(255,255,255,0.3)',
+                        borderTop: 'none',
+                        borderLeft: 'none',
+                        backdropFilter: 'blur(16px)',
+                      }}
+                    />
+                  </span>
                 </button>
               );
             })}
+
+            {/* Theme toggle — part of the evenly spaced row */}
+            <button
+              type="button"
+              onClick={() => setTheme(isLight ? 'dark' : 'light')}
+              className="group relative flex items-center justify-center rounded-xl p-2.5 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+              aria-label="Toggle color theme">
+              {isLight ?
+                <Moon className="h-[18px] w-[18px]" />
+              : <Sun className="h-[18px] w-[18px]" />}
+
+              <span
+                className="pointer-events-none absolute -top-11 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xl px-3 py-1.5 text-xs font-semibold tracking-wide opacity-0 transition-none group-hover:opacity-100"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 100%)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                  border: '1px solid rgba(255,255,255,0.35)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.25), 0 1px 0 rgba(255,255,255,0.4) inset',
+                  color: 'var(--foreground)',
+                }}>
+                {isLight ? 'Light Mode' : 'Dark Mode'}
+                <span
+                  className="absolute -bottom-[5px] left-1/2 -translate-x-1/2 block h-2.5 w-2.5 rotate-45"
+                  style={{
+                    background: 'rgba(255,255,255,0.15)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    borderTop: 'none',
+                    borderLeft: 'none',
+                    backdropFilter: 'blur(16px)',
+                  }}
+                />
+              </span>
+            </button>
           </nav>
 
+          {/* Mobile: hamburger on the right */}
           <button
             type="button"
             aria-label="Toggle navigation menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-foreground transition-colors hover:bg-white/10 md:hidden"
+            className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl text-foreground transition-colors hover:bg-white/10 md:hidden"
             style={{
               border: '1px solid rgba(255,255,255,0.25)',
               background: 'rgba(255,255,255,0.08)',
@@ -193,10 +244,11 @@ export function SiteNavbar() {
             </span>
           </button>
 
+          {/* Mobile theme toggle */}
           <button
             type="button"
             onClick={() => setTheme(isLight ? 'dark' : 'light')}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-foreground transition-colors hover:bg-white/10"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-foreground transition-colors hover:bg-white/10 md:hidden"
             style={{
               border: '1px solid rgba(255,255,255,0.25)',
               background: 'rgba(255,255,255,0.08)',
@@ -208,17 +260,19 @@ export function SiteNavbar() {
           </button>
         </div>
 
+        {/* Mobile dropdown — opens upward */}
         <AnimatePresence>
           {menuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -8 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
+              exit={{ opacity: 0, y: 8 }}
               transition={{ duration: 0.2 }}
               className="md:hidden border-t border-white/10 px-3 pb-3">
               <div className="grid gap-2 pt-3">
                 {NAV_ITEMS.map((item) => {
                   const active = item.id === activeSection;
+                  const Icon = item.icon;
                   return (
                     <button
                       key={item.id}
@@ -228,11 +282,12 @@ export function SiteNavbar() {
                         setMenuOpen(false);
                       }}
                       className={[
-                        'rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors',
+                        'flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors',
                         active ?
                           'bg-foreground text-background'
                         : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
                       ].join(' ')}>
+                      <Icon className="h-4 w-4 shrink-0" />
                       {item.label}
                     </button>
                   );
