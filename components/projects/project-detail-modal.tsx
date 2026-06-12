@@ -107,11 +107,11 @@ export function ProjectDetailModal({ project }: ProjectDetailModalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="secondary"
-          className="rounded-full px-6.5 py-2.5 hover:scale-110 hover:shadow-md transition-all duration-200">
+        <button
+          type="button"
+          className="group inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 active:scale-95 border border-border text-foreground hover:scale-110 hover:shadow-md">
           View Details
-        </Button>
+        </button>
       </DialogTrigger>
 
       <DialogContent
