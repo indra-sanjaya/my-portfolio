@@ -10,7 +10,7 @@ const glowStyles = [
   'hover:shadow-[0_20px_60px_-15px_rgba(34,197,94,0.35)]', // green
   'hover:shadow-[0_20px_60px_-15px_rgba(59,130,246,0.30)]', // blue
   'hover:shadow-[0_20px_60px_-15px_rgba(245,158,11,0.30)]', // amber
-  'hover:shadow-[0_20px_60px_-15px_rgba(99,102,241,0.45)]', // brighter indigo/violet — was muted slate
+  'hover:shadow-[0_20px_60px_-15px_rgba(99,102,241,0.45)]', // indigo
   'hover:shadow-[0_20px_60px_-15px_rgba(168,85,247,0.30)]', // purple
   'hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.30)]', // emerald
 ];
@@ -19,7 +19,7 @@ const borderColors = [
   'hover:border-green-400/30',
   'hover:border-blue-400/30',
   'hover:border-amber-400/30',
-  'hover:border-indigo-400/40', // brighter to match new glow
+  'hover:border-indigo-400/40',
   'hover:border-purple-400/30',
   'hover:border-emerald-400/30',
 ];

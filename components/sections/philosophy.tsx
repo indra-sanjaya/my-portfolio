@@ -140,7 +140,6 @@ export function PhilosophySection() {
               ">
               {/* hover glow */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-br from-primary/[0.05] via-transparent to-transparent" />
-
               <div className="relative">
                 {/* top row */}
                 <div className="flex items-center justify-between mb-8">

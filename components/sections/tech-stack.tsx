@@ -8,6 +8,7 @@ import { useAnimationConfig } from '@/hooks/use-animation-config';
 import {
   SiJavascript,
   SiTypescript,
+  SiGo,
   SiReact,
   SiNextdotjs,
   SiNodedotjs,
@@ -24,6 +25,7 @@ import {
   SiVercel,
   SiLangchain,
   SiGooglegemini,
+  SiSap,
 } from 'react-icons/si';
 
 import { FaUserLock, FaMobileAlt, FaBoxes } from 'react-icons/fa';
@@ -47,6 +49,15 @@ import {
   ShieldCheck,
   Smartphone,
   Brain,
+  Leaf,
+  Award,
+  Activity,
+  AlertTriangle,
+  ClipboardCheck,
+  Handshake,
+  Warehouse,
+  FileSignature,
+  Calculator,
 } from 'lucide-react';
 
 type Tech = {
@@ -80,6 +91,11 @@ const categories: Category[] = [
         name: 'TypeScript',
         icon: <SiTypescript />,
         color: '#3178C6',
+      },
+      {
+        name: 'Go (Golang)',
+        icon: <SiGo />,
+        color: '#00ADD8',
       },
     ],
   },
@@ -220,6 +236,65 @@ const categories: Category[] = [
         name: 'EAS Build',
         icon: <FaBoxes />,
         color: '#F97316',
+      },
+    ],
+  },
+
+  {
+    title: 'Engineering & Sustainability',
+    description: '8+ years of engineering, HSE, and procurement experience across oil & gas and industrial sectors.',
+    categoryIcon: <Leaf className="w-6 h-6" />,
+    categoryIconColor: '#10B981',
+    technologies: [
+      {
+        name: 'ISO 14001 EMS',
+        icon: <Award className="w-4 h-4" />,
+        color: '#10B981',
+      },
+      {
+        name: 'CEMS Monitoring',
+        icon: <Activity className="w-4 h-4" />,
+        color: '#22C55E',
+      },
+      {
+        name: 'Environmental Risk Assessment',
+        icon: <AlertTriangle className="w-4 h-4" />,
+        color: '#F59E0B',
+      },
+      {
+        name: 'ESG Compliance & Reporting',
+        icon: <ClipboardCheck className="w-4 h-4" />,
+        color: '#16A34A',
+      },
+      {
+        name: 'HSE Inspection & Auditing',
+        icon: <ShieldCheck className="w-4 h-4" />,
+        color: '#EF4444',
+      },
+      {
+        name: 'Procurement & Vendor Management',
+        icon: <Handshake className="w-4 h-4" />,
+        color: '#F97316',
+      },
+      {
+        name: 'MRP & Inventory Optimization',
+        icon: <Warehouse className="w-4 h-4" />,
+        color: '#8B5CF6',
+      },
+      {
+        name: 'Supplier Negotiation & Contracts',
+        icon: <FileSignature className="w-4 h-4" />,
+        color: '#0EA5E9',
+      },
+      {
+        name: 'Purchasing & Cost Analysis',
+        icon: <Calculator className="w-4 h-4" />,
+        color: '#F59E0B',
+      },
+      {
+        name: 'SAP',
+        icon: <SiSap />,
+        color: '#0FAAFF',
       },
     ],
   },
@@ -426,7 +501,7 @@ export function TechStackSection() {
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: durationFast }}
                         className="px-6 sm:px-7 md:px-8 pb-7 sm:pb-8">
-                        <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
+                        <div className="grid gap-4 grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
                           {category.technologies.map((tech, index) => (
                             <motion.div
                               key={tech.name}
