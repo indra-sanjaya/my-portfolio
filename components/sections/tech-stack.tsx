@@ -383,7 +383,7 @@ export function TechStackSection() {
           <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground">Technologies</span>
 
           <h2 className="mt-4 text-[clamp(2rem,4.8vw,3.2rem)] font-bold tracking-tight text-foreground">
-            Tech Stack & AI Integration
+            Skills, Tech Stack & AI Integration
           </h2>
 
           <p className="mt-5 text-[clamp(1rem,2.2vw,1.125rem)] leading-7 text-muted-foreground max-w-3xl">
