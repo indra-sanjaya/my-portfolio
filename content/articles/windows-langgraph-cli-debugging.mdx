@@ -1,0 +1,62 @@
+---
+title: "Debugging a Windows-Only LangGraph CLI Crash"
+description: "A FileNotFoundError that only happened on my machine, traced down to mixed path separators inside the LangGraph CLI's dependency resolver."
+publishedAt: "2026-08-20"
+tags: ["debugging", "langgraph", "windows", "cli", "python"]
+draft: false
+---
+
+I was three days into building a small LangGraph agent — nothing exotic, a single graph with a couple of tool nodes — when `langgraph dev` stopped starting. Not "stopped working correctly." Stopped starting. On my machine, in a project that ran fine for a teammate on macOS the day before.
+
+That gap — works for them, breaks for me, same commit — is usually the first sign you're not looking at a bug in your code at all.
+
+## [ 01 ] The Crash
+
+The dev server would boot, print its usual banner, then die before it finished loading the graph:
+
+```text title="LISTING 01 — the traceback"
+FileNotFoundError: [Errno 2] No such file or directory:
+'/deps/langgraph-example-pyproject/my_agent\graph.py'
+```
+
+Look closely at that path. `/deps/langgraph-example-pyproject/my_agent` uses forward slashes, then it switches to a backslash before `graph.py`. That's not a typo in my config — nobody hand-writes a path like that. Something inside the CLI was *building* that string, and the two halves were coming from two different code paths that disagreed about which separator to use.
+
+<PathSeparatorDiagram />
+
+## [ 02 ] Tracing the Root Cause
+
+<PullQuote index={1}>
+  The bug wasn't in my graph. It was in how the CLI translated my config into a filesystem path — and it only showed up on the one OS where the two separator conventions actually collide.
+</PullQuote>
+
+`langgraph dev` reads `langgraph.json`, resolves each graph's `path` entry relative to the project root, and hands the result to Python's import machinery. On Linux and macOS, `/` is the only separator that exists, so any code that assembles paths by string-concatenating with `/` just happens to produce something valid. On Windows, the standard library's `pathlib` and `os.path` normalize to backslashes — but only for the parts of the path that actually pass through them. If one segment of the path was built by naive string joining (assuming POSIX) and another segment came from a `pathlib.Path` object (which Windows normalizes automatically), you get exactly the Frankenstein path in that traceback: POSIX-style up to the point where the two segments met, backslash after.
+
+This is a known class of bug in the LangGraph CLI's dependency resolver, and it was serious enough that the LangChain team shipped a dedicated fix for it — a pull request titled "[CLI] Fix relative path issue on Windows" that normalizes local dependency paths before they're used for file lookups, instead of trusting whatever separator convention the calling code happened to use.
+
+## [ 03 ] Getting Unblocked
+
+I had a deadline, so I didn't wait for a new release to trickle down through my lockfile. Three things got me moving again, roughly in the order I tried them:
+
+1. **Rewrite the `langgraph.json` path using forward slashes anyway.** Windows' filesystem APIs accept `/` in most contexts even though the shell displays `\`. This alone didn't fix the crash — the bug was inside the CLI's resolver, not in how I wrote the config — but it ruled out "my config is malformed" as the cause and let me isolate the problem to the tool itself.
+2. **Pin `langgraph-cli` to a version published after the Windows path fix landed.** Once I knew this was an upstream regression rather than something in my project, upgrading was the actual fix, not a workaround.
+3. **Fall back to WSL for the dev server while I confirmed the upgrade.** Running `langgraph dev` inside WSL sidesteps the whole class of bug, since there's only one separator convention in play. I used this as a stopgap to keep working while I verified the version bump fixed things natively.
+
+```text title="LISTING 02 — the fix, in short"
+# pyproject.toml / requirements, before
+langgraph-cli>=0.1.60
+
+# after — pinned past the Windows path-resolution fix
+langgraph-cli>=0.1.73
+```
+
+Bumping the pin and reinstalling in a clean virtualenv made the dev server boot cleanly, mixed-separator path and all.
+
+## [ 04 ] What I'd Tell a Past Version of Myself
+
+A few things about this one generalize well beyond LangGraph:
+
+- **A path string that mixes separators is never a coincidence.** It's a receipt showing you exactly where two different pieces of code disagreed about the platform they're running on. Read it literally before you start guessing.
+- **"Works on their machine" is a data point, not an accusation.** The moment a bug is OS-conditional, the search space shrinks dramatically — you're not looking for a logic error anymore, you're looking for a platform assumption.
+- **Check the issue tracker before you assume you're the first person to hit it.** Cross-platform path handling is a perennial source of bugs in any CLI tool with a large non-Windows-primary contributor base. Chances are decent someone already filed it, and often already fixed it.
+
+I still develop primarily on Windows, and I still hit the occasional tool that was clearly only ever tested on Unix. The fix is rarely to switch operating systems — it's to get comfortable reading tracebacks closely enough to tell "my code is wrong" apart from "the tool's assumptions don't hold here."

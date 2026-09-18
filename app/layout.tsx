@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { ChatWidget } from '@/components/chat/chat-widget';
 import { ThemeProvider } from '@/components/theme-provider';
+import { SITE_URL } from '@/lib/site-config';
 import './globals.css';
 
 const _geist = Geist({ subsets: ['latin'] });
@@ -13,10 +14,10 @@ export const metadata: Metadata = {
   description:
     'Software Developer with engineering background building scalable systems that solve real-world problems.',
   generator: 'v0.app',
-  metadataBase: new URL('https://indrasanjaya.dev'),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     type: 'website',
-    url: 'https://indrasanjaya.dev',
+    url: SITE_URL,
     title: 'Indra Sanjaya | Software Developer',
     description:
       'Software Developer with engineering background building scalable systems that solve real-world problems.',

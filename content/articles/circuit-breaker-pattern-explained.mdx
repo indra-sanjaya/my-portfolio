@@ -1,0 +1,89 @@
+---
+title: "The Circuit Breaker Pattern, Explained by Someone Who Used to Install Real Ones"
+description: "Retry storms, cascading failures, and why the software pattern named after an electrical safety device works for exactly the same reason the real thing does."
+publishedAt: "2026-07-15"
+tags: ["backend", "system-design", "resilience", "typescript"]
+draft: false
+---
+
+Before I wrote software for a living, I spent eight years in HSE and environmental engineering across oil & gas and industrial sites — including LNG construction, where an overcurrent protection device isn't an abstraction, it's a physical piece of equipment sized to trip before a fault turns into a fire. So when I first read about the "circuit breaker pattern" in a backend architecture doc, it didn't land as a metaphor. It landed as the exact same idea, one layer removed from the copper.
+
+## [ 01 ] The Retry Storm Problem
+
+A downstream service starts timing out — a database under load, a third-party API having a bad day, doesn't matter which. Every caller upstream of it does the reasonable-sounding thing: catch the timeout, retry. Multiply that by every request that was in flight, then by every retry those requests trigger, and the traffic hitting the already-struggling service doesn't drop while it's recovering — it spikes. The retries themselves become the reason the service never gets a chance to recover.
+
+This is a retry storm, and it's the software equivalent of every appliance in a building drawing full current through a fault at once. The individual retry logic is locally correct — of course you retry a failed request — and globally catastrophic.
+
+## [ 02 ] Three States, Borrowed From Electrical Engineering
+
+A real breaker doesn't have "retry harder" as a behavior. It has exactly one job: stop current flow the instant it detects a fault, and stay open until someone (or something) confirms it's safe to close again. The software pattern copies that state machine almost exactly:
+
+- **Closed** — requests flow through normally. The breaker counts failures.
+- **Open** — once failures cross a threshold, the breaker stops calling the downstream service entirely and fails fast, immediately, for every request, without waiting for the actual timeout.
+- **Half-Open** — after a cooldown period, the breaker lets a small number of trial requests through. Success closes the breaker again; failure trips it back open.
+
+<PullQuote index={1}>
+  A breaker that's Open isn't broken — it's the one part of the system doing exactly what it was designed to do. The mistake is judging it by whether requests are succeeding instead of whether it's protecting something.
+</PullQuote>
+
+## [ 03 ] Implementing It
+
+The state machine is small enough to write without a library, which is worth doing at least once so the failure modes below actually make sense:
+
+```ts title="LISTING 01 — a minimal circuit breaker"
+type State = "closed" | "open" | "half-open";
+
+class CircuitBreaker {
+  private state: State = "closed";
+  private failures = 0;
+  private nextAttempt = 0;
+
+  constructor(
+    private readonly failureThreshold = 5,
+    private readonly resetTimeoutMs = 30_000,
+  ) {}
+
+  async call<T>(fn: () => Promise<T>): Promise<T> {
+    if (this.state === "open") {
+      if (Date.now() < this.nextAttempt) {
+        throw new Error("circuit open: failing fast");
+      }
+      this.state = "half-open";
+    }
+
+    try {
+      const result = await fn();
+      this.onSuccess();
+      return result;
+    } catch (err) {
+      this.onFailure();
+      throw err;
+    }
+  }
+
+  private onSuccess() {
+    this.failures = 0;
+    this.state = "closed";
+  }
+
+  private onFailure() {
+    this.failures += 1;
+    if (this.failures >= this.failureThreshold) {
+      this.state = "open";
+      this.nextAttempt = Date.now() + this.resetTimeoutMs;
+    }
+  }
+}
+```
+
+The part that's easy to miss reading the summary version of this pattern: the `Open` branch doesn't retry the call and swallow the error — it throws immediately, before `fn()` ever runs. Failing fast is the entire point. A caller that's blocked waiting on a timeout that was never going to succeed is still consuming a thread, a connection, a slot in some upstream queue. An immediate rejection gives that resource back right away.
+
+## [ 04 ] Where It Breaks Down
+
+A few things the basic version above doesn't handle, that matter once this is running against real traffic:
+
+- **One breaker per dependency, not one global breaker.** A single shared breaker across every downstream call means one flaky dependency trips protection for calls that had nothing to do with it. Scope breakers to the specific service (or even endpoint) they're protecting.
+- **The thundering herd on Half-Open.** If every one of a thousand blocked callers gets let through the instant the breaker goes half-open, you've recreated the retry storm at the exact moment you were trying to test recovery. Limit half-open to a small, fixed number of trial requests, not "whatever's currently queued."
+- **A breaker alone doesn't fix a slow dependency, it just stops making it worse.** It needs to sit alongside real timeouts and, ideally, bulkheads (isolating the connection pool or thread pool a given dependency uses) so one failing service can't exhaust resources shared with healthy ones. The breaker is the safety device; it's not a substitute for sizing the circuit correctly in the first place.
+
+That last point is the one my old field feels most familiar to me: a breaker rated too high doesn't protect anything, and a system with no isolation between circuits turns one fault into a building-wide outage no matter how well the breaker itself works. The pattern's only as good as where you draw the boundaries around it.

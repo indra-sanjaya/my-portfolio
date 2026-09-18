@@ -2,13 +2,28 @@
 
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Moon, Sun, Home, User, TrendingUp, FolderKanban, Lightbulb, Layers, Award, Mail } from 'lucide-react';
+import {
+  Moon,
+  Sun,
+  Home,
+  User,
+  TrendingUp,
+  FolderKanban,
+  Lightbulb,
+  Layers,
+  Award,
+  Mail,
+  BookOpen,
+} from 'lucide-react';
 import { useTheme } from 'next-themes';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface NavItem {
   id: string;
   label: string;
   icon: React.ElementType;
+  href?: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -20,6 +35,12 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'tech-stack', label: 'Stack', icon: Layers },
   { id: 'certifications', label: 'Certifications', icon: Award },
   { id: 'contact', label: 'Contact', icon: Mail },
+  { id: 'articles', label: 'Articles', icon: BookOpen, href: '/articles' },
+];
+
+const ARTICLES_ROUTE_NAV_ITEMS: NavItem[] = [
+  { id: 'home', label: 'Home', icon: Home, href: '/' },
+  { id: 'articles', label: 'Articles', icon: BookOpen, href: '/articles' },
 ];
 
 function scrollToId(id: string) {
@@ -49,13 +70,16 @@ export function SiteNavbar() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
+  const onArticlesRoute = pathname?.startsWith('/articles') ?? false;
+  const items = onArticlesRoute ? ARTICLES_ROUTE_NAV_ITEMS : NAV_ITEMS;
 
   useEffect(() => {
     setMounted(true);
 
     const onScroll = () => {
       setVisible(window.scrollY > 10);
-      setActiveSection(getActiveSection());
+      if (!onArticlesRoute) setActiveSection(getActiveSection());
     };
 
     const onResize = () => setActiveSection(getActiveSection());
@@ -131,21 +155,17 @@ export function SiteNavbar() {
         <div className="relative z-10 flex items-center gap-2 p-2">
           {/* Desktop nav — full width, evenly spaced including theme button */}
           <nav className="hidden md:flex w-full items-center justify-around">
-            {NAV_ITEMS.map((item) => {
-              const active = item.id === activeSection;
+            {items.map((item) => {
+              const active = onArticlesRoute ? item.id === 'articles' : item.id === activeSection;
               const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => scrollToId(item.id)}
-                  aria-label={item.label}
-                  className={[
-                    'group relative flex items-center justify-center rounded-xl p-2.5 transition-colors',
-                    active ?
-                      'bg-foreground text-background'
-                    : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
-                  ].join(' ')}>
+              const navItemClassName = [
+                'group relative flex items-center justify-center rounded-xl p-2.5 transition-colors',
+                active ?
+                  'bg-foreground text-background'
+                : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
+              ].join(' ');
+              const content = (
+                <>
                   <Icon className="h-[18px] w-[18px]" />
 
                   {/* Floating label */}
@@ -172,8 +192,21 @@ export function SiteNavbar() {
                       }}
                     />
                   </span>
-                </button>
+                </>
               );
+
+              return item.href ?
+                  <Link key={item.id} href={item.href} aria-label={item.label} className={navItemClassName}>
+                    {content}
+                  </Link>
+                : <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => scrollToId(item.id)}
+                    aria-label={item.label}
+                    className={navItemClassName}>
+                    {content}
+                  </button>;
             })}
 
             {/* Theme toggle — part of the evenly spaced row */}
@@ -270,27 +303,40 @@ export function SiteNavbar() {
               transition={{ duration: 0.2 }}
               className="md:hidden border-t border-white/10 px-3 pb-3">
               <div className="grid gap-2 pt-3">
-                {NAV_ITEMS.map((item) => {
-                  const active = item.id === activeSection;
+                {items.map((item) => {
+                  const active = onArticlesRoute ? item.id === 'articles' : item.id === activeSection;
                   const Icon = item.icon;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => {
-                        scrollToId(item.id);
-                        setMenuOpen(false);
-                      }}
-                      className={[
-                        'flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors',
-                        active ?
-                          'bg-foreground text-background'
-                        : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
-                      ].join(' ')}>
+                  const navItemClassName = [
+                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors',
+                    active ?
+                      'bg-foreground text-background'
+                    : 'text-muted-foreground hover:bg-white/10 hover:text-foreground',
+                  ].join(' ');
+                  const content = (
+                    <>
                       <Icon className="h-4 w-4 shrink-0" />
                       {item.label}
-                    </button>
+                    </>
                   );
+
+                  return item.href ?
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        onClick={() => setMenuOpen(false)}
+                        className={navItemClassName}>
+                        {content}
+                      </Link>
+                    : <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          scrollToId(item.id);
+                          setMenuOpen(false);
+                        }}
+                        className={navItemClassName}>
+                        {content}
+                      </button>;
                 })}
               </div>
             </motion.div>

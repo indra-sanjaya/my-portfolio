@@ -1,0 +1,135 @@
+---
+title: "Building an AI PDF Chatbot with LangChain, MongoDB Atlas Vector Search, and Gemini"
+description: "A working RAG pipeline for chatting over PDF documents — chunking, embeddings, an Atlas vector index, and a retrieval chain wired up to Gemini."
+publishedAt: "2026-09-10"
+tags: ["rag", "langchain", "mongodb", "gemini", "vector-search"]
+featured: true
+draft: false
+---
+
+Most "AI chat with your documents" demos skip the part that actually determines whether the thing is useful: how the retrieval half of retrieval-augmented generation is built. The generation half — hand a language model some context and a question — is close to a solved problem. Getting the *right* context in front of it, from a pile of PDFs, on infrastructure you can actually operate, is where most of the real engineering lives.
+
+This is the pipeline I ended up with for a document chatbot built on LangChain, MongoDB Atlas Vector Search, and Gemini — what each piece does, and the couple of decisions that mattered more than I expected going in.
+
+## [ 01 ] Architecture Overview
+
+Four stages, each with one job:
+
+1. **Ingestion** — load a PDF, split it into overlapping chunks small enough to embed meaningfully.
+2. **Embedding** — turn each chunk into a vector with a Gemini embedding model.
+3. **Storage + indexing** — write the chunks and vectors into a MongoDB Atlas collection with a vector search index defined on top of it.
+4. **Retrieval + generation** — embed the incoming question, run a `$vectorSearch` query to pull the closest chunks, and hand them to Gemini as context.
+
+<RagArchitectureDiagram />
+
+The reason Atlas specifically: the vector index lives on the same collection as the source documents and their metadata, so a single `$vectorSearch` aggregation stage can filter by metadata (document owner, upload date, document type) in the same query that does the similarity search. No separate vector database to keep in sync with your document store.
+
+## [ 02 ] Ingesting the PDF
+
+```python title="LISTING 01 — chunking a PDF"
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+loader = PyPDFLoader("handbook.pdf")
+pages = loader.load()
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=150,
+)
+chunks = splitter.split_documents(pages)
+```
+
+`chunk_overlap` is the setting most tutorials gloss over, and it's the one I ended up tuning the most. Too little overlap and you get chunks that cut a sentence — or an entire idea — in half at the boundary, so a question whose answer straddles two chunks retrieves neither one cleanly. Too much overlap and you're paying to embed and store the same text repeatedly, and near-duplicate chunks start crowding out genuinely different results in your top-k. 150 tokens of overlap on 1000-token chunks was the balance that worked for dense, section-heavy PDFs like handbooks and specs; shorter, more conversational source documents needed less.
+
+## [ 03 ] Embeddings and the Vector Index
+
+```python title="LISTING 02 — embedding and storing chunks"
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_mongodb import MongoDBAtlasVectorSearch
+from pymongo import MongoClient
+
+client = MongoClient(MONGODB_URI)
+collection = client["docs"]["chunks"]
+
+embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+
+vector_store = MongoDBAtlasVectorSearch.from_documents(
+    documents=chunks,
+    embedding=embeddings,
+    collection=collection,
+    index_name="chunks_vector_index",
+)
+```
+
+<PullQuote index={1}>
+  The vector index's `numDimensions` has to match your embedding model's output size exactly. Change embedding models later and the index silently stops returning results — it doesn't error, it just returns nothing useful.
+</PullQuote>
+
+That index isn't created by the Python driver — it's a separate Atlas Search index definition, created once through the Atlas UI or the Atlas Administration API:
+
+```json title="LISTING 03 — Atlas vector index definition"
+{
+  "fields": [
+    {
+      "type": "vector",
+      "path": "embedding",
+      "numDimensions": 768,
+      "similarity": "cosine"
+    },
+    {
+      "type": "filter",
+      "path": "metadata.source"
+    }
+  ]
+}
+```
+
+The `filter` field on `metadata.source` is what makes the metadata-scoped queries from the architecture overview possible — without declaring a field as filterable in the index, you can't combine it with the vector search in a single aggregation stage.
+
+## [ 04 ] Retrieval and Generation
+
+```python title="LISTING 04 — the retrieval chain"
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+
+prompt = ChatPromptTemplate.from_template(
+    """Answer the question using only the context below.
+If the context doesn't contain the answer, say you don't know.
+
+Context:
+{context}
+
+Question:
+{question}"""
+)
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | model
+    | StrOutputParser()
+)
+
+answer = chain.invoke("What's the escalation policy for a P1 incident?")
+```
+
+"Answer using only the context below" is doing more work than it looks like. Without an explicit instruction to stay inside the retrieved context, Gemini — like most capable models — will happily fill gaps with its own training data, which is exactly the failure mode RAG is supposed to prevent: a confident, plausible-sounding answer that isn't actually grounded in your documents.
+
+## [ 05 ] What I'd Do Differently at Scale
+
+This pipeline is honest about being a starting point, not a production system:
+
+- **Reranking.** Vector similarity alone regularly puts a chunk that's topically close but not actually responsive above one that directly answers the question. A cross-encoder reranking pass over the top 20–30 candidates before truncating to the final 5 consistently improved answer quality more than any amount of chunking-strategy tuning did.
+- **Hybrid search.** Pure vector search struggles with exact-match queries — part numbers, error codes, proper nouns — that a plain keyword search handles trivially. Atlas supports combining `$vectorSearch` with Atlas Search's full-text scoring in one pipeline, which covers both cases without running two separate systems.
+- **Chunk-level metadata for citations.** Storing the source page number alongside each chunk costs nothing at ingestion time and turns "here's an answer" into "here's an answer, see page 14" — which matters a lot more to a document chatbot's users than raw answer accuracy does.
+
+None of these are exotic. They're the difference between a demo that works on the PDF you tested with and a chatbot someone can actually trust with real documents.

@@ -12,6 +12,69 @@ const SUGGESTED_PROMPTS = [
   'Is Indra a fit for a full-stack role?',
 ];
 
+const MARKDOWN_LINK_PATTERN = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+const BARE_URL_PATTERN = /(https?:\/\/[^\s]+)/g;
+
+function LinkifiedUrl({ url, keyPrefix }: { url: string; keyPrefix: string }) {
+  const trimmed = url.replace(/[)\].,!?;:]+$/, '');
+  const trailing = url.slice(trimmed.length);
+  return (
+    <span key={keyPrefix}>
+      <a
+        href={trimmed}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline underline-offset-2 hover:text-hazard">
+        {trimmed}
+      </a>
+      {trailing}
+    </span>
+  );
+}
+
+function linkifyBareUrls(text: string, keyPrefix: string): React.ReactNode[] {
+  return text
+    .split(BARE_URL_PATTERN)
+    .map((segment, i) =>
+      /^https?:\/\//.test(segment) ?
+        <LinkifiedUrl key={`${keyPrefix}-${i}`} url={segment} keyPrefix={`${keyPrefix}-${i}`} />
+      : segment,
+    );
+}
+
+function linkifyText(text: string, keyPrefix: string): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let i = 0;
+  MARKDOWN_LINK_PATTERN.lastIndex = 0;
+
+  while ((match = MARKDOWN_LINK_PATTERN.exec(text)) !== null) {
+    const [full, label, url] = match;
+    if (match.index > lastIndex) {
+      nodes.push(...linkifyBareUrls(text.slice(lastIndex, match.index), `${keyPrefix}-pre${i}`));
+    }
+    nodes.push(
+      <a
+        key={`${keyPrefix}-md${i}`}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline underline-offset-2 hover:text-hazard">
+        {label}
+      </a>,
+    );
+    lastIndex = match.index + full.length;
+    i += 1;
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(...linkifyBareUrls(text.slice(lastIndex), `${keyPrefix}-post`));
+  }
+
+  return nodes;
+}
+
 export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -99,7 +162,11 @@ export function ChatWidget() {
                         'bg-foreground text-background rounded-br-sm'
                       : 'bg-background/60 border border-border/40 text-foreground rounded-bl-sm'
                     }`}>
-                    {m.parts.map((part, i) => (part.type === 'text' ? <span key={i}>{part.text}</span> : null))}
+                    {m.parts.map((part, i) =>
+                      part.type === 'text' ?
+                        <span key={i}>{linkifyText(part.text, `${m.id}-${i}`)}</span>
+                      : null,
+                    )}
                   </div>
                 </div>
               ))}

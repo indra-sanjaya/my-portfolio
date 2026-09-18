@@ -37,6 +37,8 @@
   --sidebar-accent-foreground: oklch(0.33 0.015 245);
   --sidebar-border: oklch(0.88 0.015 245);
   --sidebar-ring: oklch(0.62 0.09 235);
+  --hazard: oklch(0.72 0.19 55);
+  --hazard-foreground: oklch(0.18 0.02 55);
 }
 
 .dark {
@@ -72,6 +74,8 @@
   --sidebar-accent-foreground: oklch(0.98 0 0);
   --sidebar-border: oklch(0.22 0 0);
   --sidebar-ring: oklch(0.55 0.06 250);
+  --hazard: oklch(0.75 0.19 55);
+  --hazard-foreground: oklch(0.12 0.02 55);
 }
 
 @theme inline {
@@ -113,6 +117,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-hazard: var(--hazard);
+  --color-hazard-foreground: var(--hazard-foreground);
 }
 
 @layer base {
@@ -156,5 +162,38 @@
 
   .section-y-tight {
     padding-block: clamp(3.5rem, 6vw, 6.5rem);
+  }
+
+  .blueprint-grid {
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+}
+
+/* Shiki dual-theme (light/dark) code blocks, rendered via rehype-pretty-code.
+   rehype-pretty-code does NOT add a `.shiki` class to the <pre> — it only sets
+   data-theme and per-token --shiki-light/--shiki-dark custom properties — so
+   these rules target the figure wrapper it does emit instead. Variable names
+   confirmed against the installed shiki version's dual-theme output. */
+@layer base {
+  figure[data-rehype-pretty-code-figure] pre,
+  figure[data-rehype-pretty-code-figure] pre span {
+    color: var(--shiki-light);
+  }
+  figure[data-rehype-pretty-code-figure] pre {
+    overflow-x: auto;
+    padding: 1.25rem 1.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    background-color: var(--shiki-light-bg);
+  }
+  .dark figure[data-rehype-pretty-code-figure] pre,
+  .dark figure[data-rehype-pretty-code-figure] pre span {
+    color: var(--shiki-dark);
+  }
+  .dark figure[data-rehype-pretty-code-figure] pre {
+    background-color: var(--shiki-dark-bg);
   }
 }
