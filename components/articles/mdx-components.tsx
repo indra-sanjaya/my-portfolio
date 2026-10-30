@@ -5,6 +5,10 @@ import { CodeFigcaption, CodeFigure, InlineOrBlockCode } from './code-block';
 import { PullQuote } from './pull-quote';
 import { RagArchitectureDiagram } from './rag-architecture-diagram';
 import { PathSeparatorDiagram } from './path-separator-diagram';
+import { ArticleFigure } from './article-figure';
+import { LinkPreviewDiagram } from './link-preview-diagram';
+import { MetadataAudiencesDiagram } from './metadata-audiences-diagram';
+import { MetadataPipelineDiagram } from './metadata-pipeline-diagram';
 import { SectionHeading2, SectionHeading3 } from './section-heading';
 
 export const articleMdxComponents: NonNullable<MDXRemoteProps['components']> = {
@@ -43,4 +47,8 @@ export const articleMdxComponents: NonNullable<MDXRemoteProps['components']> = {
   PullQuote,
   RagArchitectureDiagram,
   PathSeparatorDiagram,
+  ArticleFigure,
+  MetadataAudiencesDiagram,
+  MetadataPipelineDiagram,
+  LinkPreviewDiagram,
 };
