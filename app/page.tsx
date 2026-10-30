@@ -8,10 +8,27 @@ import { CertificationsSection } from '@/components/sections/certifications';
 import { ContactSection } from '@/components/sections/contact';
 import { Footer } from '@/components/sections/footer';
 import { SiteNavbar } from '@/components/site-navbar';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, SOCIAL_LINKS } from '@/lib/site-config';
+
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE_NAME,
+  url: SITE_URL,
+  image: `${SITE_URL}/profile_picture2.jpg`,
+  jobTitle: 'Fullstack Software Developer',
+  description: SITE_DESCRIPTION,
+  address: { '@type': 'PostalAddress', addressLocality: 'Jakarta', addressCountry: 'ID' },
+  sameAs: SOCIAL_LINKS,
+};
 
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd).replace(/</g, '\\u003c') }}
+      />
       <SiteNavbar />
       <main className="relative min-h-screen overflow-x-clip bg-background">
         <div className="pointer-events-none absolute inset-0 -z-10">
