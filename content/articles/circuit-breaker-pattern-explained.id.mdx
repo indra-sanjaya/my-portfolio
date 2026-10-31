@@ -1,0 +1,86 @@
+---
+title: "Circuit Breaker Pattern, Dijelaskan oleh Orang yang Dulu Memasang yang Asli"
+description: "Retry storm, kegagalan berantai, dan alasan pola perangkat lunak yang namanya diambil dari alat pengaman listrik bekerja dengan prinsip yang persis sama."
+---
+
+Sebelum menulis perangkat lunak sebagai pekerjaan, aku menghabiskan delapan tahun di bidang HSE dan teknik lingkungan di lokasi migas dan industri, termasuk konstruksi LNG. Di sana, alat proteksi arus lebih bukan sesuatu yang abstrak. Ia adalah perangkat fisik yang ukurannya dihitung supaya trip sebelum gangguan berubah menjadi kebakaran. Jadi ketika pertama kali membaca tentang "circuit breaker pattern" di dokumen arsitektur backend, aku tidak menganggapnya metafora. Ia terasa seperti gagasan yang sama persis, hanya satu lapisan di atas kabel tembaga.
+
+## [ 01 ] Masalah Retry Storm
+
+Sebuah layanan downstream mulai timeout, bisa database yang kewalahan atau API pihak ketiga yang sedang bermasalah, tidak penting yang mana. Setiap pemanggil di hulunya melakukan hal yang terdengar masuk akal: menangkap timeout, lalu mencoba lagi. Kalikan dengan semua request yang sedang berjalan, lalu kalikan lagi dengan setiap retry yang dipicu request-request itu. Trafik yang menghantam layanan yang sudah kesulitan itu tidak turun saat ia mencoba pulih, justru melonjak. Retry itu sendiri menjadi alasan layanan tidak pernah punya kesempatan untuk pulih.
+
+Inilah retry storm, padanan perangkat lunak dari seluruh peralatan di sebuah gedung yang menarik arus penuh melewati titik gangguan secara bersamaan. Logika retry secara lokal benar, tentu saja kamu mengulang request yang gagal, tetapi secara global menjadi bencana.
+
+## [ 02 ] Tiga State, Dipinjam dari Teknik Elektro
+
+Breaker sungguhan tidak punya perilaku "coba lebih keras". Tugasnya hanya satu: menghentikan aliran arus begitu mendeteksi gangguan, dan tetap terbuka sampai seseorang (atau sesuatu) memastikan aman untuk menutupnya lagi. Pola perangkat lunaknya menyalin mesin state itu hampir persis:
+
+- **Closed**: request mengalir seperti biasa. Breaker menghitung kegagalan.
+- **Open**: begitu kegagalan melewati ambang batas, breaker berhenti memanggil layanan downstream sama sekali dan langsung gagal cepat untuk setiap request, tanpa menunggu timeout yang sebenarnya.
+- **Half-Open**: setelah masa jeda (cooldown), breaker mengizinkan sejumlah kecil request percobaan lewat. Jika berhasil, breaker menutup lagi; jika gagal, breaker trip dan kembali terbuka.
+
+<PullQuote index={1}>
+  Breaker yang sedang Open bukan breaker yang rusak. Ia adalah satu-satunya bagian sistem yang sedang melakukan persis apa yang dirancangkan untuknya. Kesalahannya adalah menilainya dari apakah request berhasil, bukan dari apakah ia sedang melindungi sesuatu.
+</PullQuote>
+
+## [ 03 ] Implementasinya
+
+Mesin state ini cukup kecil untuk ditulis tanpa library, dan itu layak dilakukan setidaknya sekali supaya mode kegagalan di bawah benar-benar masuk akal:
+
+```ts title="LISTING 01 — circuit breaker minimal"
+type State = "closed" | "open" | "half-open";
+
+class CircuitBreaker {
+  private state: State = "closed";
+  private failures = 0;
+  private nextAttempt = 0;
+
+  constructor(
+    private readonly failureThreshold = 5,
+    private readonly resetTimeoutMs = 30_000,
+  ) {}
+
+  async call<T>(fn: () => Promise<T>): Promise<T> {
+    if (this.state === "open") {
+      if (Date.now() < this.nextAttempt) {
+        throw new Error("circuit open: failing fast");
+      }
+      this.state = "half-open";
+    }
+
+    try {
+      const result = await fn();
+      this.onSuccess();
+      return result;
+    } catch (err) {
+      this.onFailure();
+      throw err;
+    }
+  }
+
+  private onSuccess() {
+    this.failures = 0;
+    this.state = "closed";
+  }
+
+  private onFailure() {
+    this.failures += 1;
+    if (this.failures >= this.failureThreshold) {
+      this.state = "open";
+      this.nextAttempt = Date.now() + this.resetTimeoutMs;
+    }
+  }
+}
+```
+
+Bagian yang mudah terlewat saat membaca versi ringkas pola ini: cabang `Open` tidak mencoba memanggil lalu menelan error. Ia melempar error seketika, sebelum `fn()` sempat dijalankan. Gagal cepat adalah inti dari semuanya. Pemanggil yang terblokir menunggu timeout yang memang tidak akan berhasil tetap memakai satu thread, satu koneksi, satu slot di antrean hulu. Penolakan seketika mengembalikan sumber daya itu saat itu juga.
+
+## [ 04 ] Di Mana Ia Tidak Cukup
+
+Beberapa hal yang tidak ditangani versi dasar di atas, dan menjadi penting begitu ia berjalan menghadapi trafik sungguhan:
+
+- **Satu breaker per dependensi, bukan satu breaker global.** Satu breaker bersama untuk semua panggilan downstream berarti satu dependensi yang bermasalah ikut memicu proteksi untuk panggilan yang tidak ada hubungannya. Batasi cakupan breaker pada layanan (atau bahkan endpoint) yang dilindunginya.
+- **Thundering herd saat Half-Open.** Jika seribu pemanggil yang tertahan semuanya dilepas begitu breaker masuk half-open, kamu membuat ulang retry storm tepat di saat kamu sedang menguji pemulihan. Batasi half-open pada sejumlah kecil request percobaan yang tetap, bukan "apa pun yang sedang mengantre".
+- **Breaker saja tidak memperbaiki dependensi yang lambat, ia hanya berhenti memperburuknya.** Ia perlu bersanding dengan timeout yang nyata dan, idealnya, bulkhead (mengisolasi connection pool atau thread pool yang dipakai suatu dependensi) agar satu layanan yang gagal tidak menghabiskan sumber daya yang dipakai bersama layanan sehat. Breaker adalah alat pengaman; ia bukan pengganti dari menentukan ukuran sirkuit dengan benar sejak awal.
+
+Poin terakhir itu yang paling terasa akrab dari dunia lamaku: breaker dengan rating terlalu tinggi tidak melindungi apa pun, dan sistem tanpa isolasi antarsirkuit mengubah satu gangguan menjadi pemadaman satu gedung, sebaik apa pun breakernya sendiri. Sebuah pola hanya sebaik tempat kamu menarik batas di sekelilingnya.

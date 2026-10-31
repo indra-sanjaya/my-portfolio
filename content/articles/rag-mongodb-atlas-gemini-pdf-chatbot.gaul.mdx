@@ -1,0 +1,135 @@
+---
+title: "Bikin Chatbot PDF Pakai AI dengan LangChain, MongoDB Atlas Vector Search, dan Gemini"
+description: "Pipeline RAG yang beneran jalan buat ngobrol sama dokumen PDF: chunking, embedding, indeks vektor Atlas, dan retrieval chain yang nyambung ke Gemini."
+---
+
+Kebanyakan demo "chat sama dokumenmu" ngelewatin bagian yang sebenarnya nentuin sistemnya berguna atau enggak: gimana separuh retrieval dari retrieval-augmented generation itu dibangun. Separuh generation-nya, yaitu ngasih model bahasa sedikit konteks sama satu pertanyaan, hampir bisa dibilang masalah yang udah kelar. Naruh konteks yang *tepat* di depan modelnya, dari tumpukan PDF, di infrastruktur yang beneran bisa kamu operasiin, di situlah sebagian besar kerja teknik yang sesungguhnya ada.
+
+Ini pipeline yang akhirnya aku pakai buat chatbot dokumen berbasis LangChain, MongoDB Atlas Vector Search, dan Gemini: tiap bagian fungsinya apa, dan beberapa keputusan yang ternyata jauh lebih penting dari dugaanku di awal.
+
+## [ 01 ] Gambaran Arsitektur
+
+Empat tahap, masing-masing satu tugas:
+
+1. **Ingestion**: load PDF, terus pecah jadi chunk yang saling tumpang tindih dan cukup kecil biar embedding-nya bermakna.
+2. **Embedding**: ubah tiap chunk jadi vektor pakai model embedding Gemini.
+3. **Penyimpanan + indexing**: tulis chunk dan vektornya ke koleksi MongoDB Atlas yang di atasnya didefinisiin indeks vector search.
+4. **Retrieval + generation**: embed pertanyaan yang masuk, jalanin query `$vectorSearch` buat narik chunk terdekat, terus serahin ke Gemini sebagai konteks.
+
+<RagArchitectureDiagram
+  label="FIG. 01 — Arsitektur"
+  caption="Ingestion nulis chunk dan vektor ke koleksi Atlas yang sama dengan yang dibaca $vectorSearch pas query: satu penyimpanan, satu query, sekaligus ngurus kemiripan dan filter metadata."
+  alt="Diagram PDF yang dipecah dan di-embed ke indeks vektor MongoDB Atlas, dengan pertanyaan masuk yang di-embed dan digabung ke query $vectorSearch di indeks yang sama sebelum dikirim ke Gemini buat jawaban akhirnya."
+/>
+
+Kenapa Atlas: indeks vektornya numpang di koleksi yang sama dengan dokumen sumber dan metadatanya, jadi satu tahap agregasi `$vectorSearch` bisa sekalian nyaring berdasarkan metadata (pemilik dokumen, tanggal upload, jenis dokumen) di query yang sama dengan pencarian kemiripan. Gak perlu database vektor terpisah yang harus kamu jaga biar sinkron sama penyimpanan dokumenmu.
+
+## [ 02 ] Ingest PDF-nya
+
+```python title="LISTING 01 — mecah PDF jadi chunk"
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+loader = PyPDFLoader("handbook.pdf")
+pages = loader.load()
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1000,
+    chunk_overlap=150,
+)
+chunks = splitter.split_documents(pages)
+```
+
+`chunk_overlap` itu pengaturan yang kebanyakan tutorial lewatin begitu aja, dan justru yang paling sering aku utak-atik. Kalau overlap-nya terlalu kecil, kamu dapet chunk yang motong kalimat, atau bahkan satu ide utuh, jadi dua di batasnya, jadi pertanyaan yang jawabannya kebagi di dua chunk gak narik keduanya dengan bersih. Kalau terlalu gede, kamu bayar buat embed dan nyimpen teks yang sama berkali-kali, dan chunk yang hampir kembar mulai nyingkirin hasil yang beneran beda dari top-k. Overlap 150 token di chunk 1000 token itu keseimbangan yang cocok buat PDF padat dan banyak bagian kayak handbook dan spesifikasi; dokumen yang lebih pendek dan lebih santai butuhnya lebih kecil.
+
+## [ 03 ] Embedding dan Indeks Vektor
+
+```python title="LISTING 02 — embed dan simpan chunk"
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_mongodb import MongoDBAtlasVectorSearch
+from pymongo import MongoClient
+
+client = MongoClient(MONGODB_URI)
+collection = client["docs"]["chunks"]
+
+embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
+
+vector_store = MongoDBAtlasVectorSearch.from_documents(
+    documents=chunks,
+    embedding=embeddings,
+    collection=collection,
+    index_name="chunks_vector_index",
+)
+```
+
+<PullQuote index={1}>
+  Nilai `numDimensions` di indeks vektor harus persis sama dengan ukuran output model embedding-mu. Kalau nanti kamu ganti model embedding, indeksnya diem-diem berhenti ngasih hasil. Dia gak error, cuma ngembaliin sesuatu yang gak berguna.
+</PullQuote>
+
+Indeks itu bukan dibuat sama driver Python. Dia definisi Atlas Search index tersendiri, dibuat sekali lewat UI Atlas atau Atlas Administration API:
+
+```json title="LISTING 03 — definisi indeks vektor Atlas"
+{
+  "fields": [
+    {
+      "type": "vector",
+      "path": "embedding",
+      "numDimensions": 768,
+      "similarity": "cosine"
+    },
+    {
+      "type": "filter",
+      "path": "metadata.source"
+    }
+  ]
+}
+```
+
+Field `filter` di `metadata.source` inilah yang bikin query berbasis metadata dari gambaran arsitektur tadi bisa jalan. Kalau sebuah field gak dideklarasiin bisa-difilter di indeks, kamu gak bisa nge-gabungin dia sama vector search dalam satu tahap agregasi.
+
+## [ 04 ] Retrieval dan Generation
+
+```python title="LISTING 04 — retrieval chain"
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+
+retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+
+prompt = ChatPromptTemplate.from_template(
+    """Answer the question using only the context below.
+If the context doesn't contain the answer, say you don't know.
+
+Context:
+{context}
+
+Question:
+{question}"""
+)
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | model
+    | StrOutputParser()
+)
+
+answer = chain.invoke("What's the escalation policy for a P1 incident?")
+```
+
+Instruksi "Answer using only the context below" itu kerjanya jauh lebih berat dari kelihatannya. Tanpa instruksi eksplisit buat tetap di dalam konteks yang diambil, Gemini, kayak kebanyakan model yang jago, bakal dengan senang hati nambal celah pakai data latihannya sendiri. Itu persis mode gagal yang harusnya dicegah RAG: jawaban yang pede dan kedengerannya meyakinkan, tapi sebenarnya gak berpijak di dokumenmu.
+
+## [ 05 ] Yang Bakal Aku Ubah Kalau Skalanya Lebih Gede
+
+Pipeline ini jujur sebagai titik awal, bukan sistem produksi:
+
+- **Reranking.** Kemiripan vektor doang sering naruh chunk yang topiknya deket tapi gak beneran njawab di atas chunk yang langsung njawab pertanyaan. Satu tahap reranking cross-encoder atas 20–30 kandidat teratas sebelum dipangkas jadi 5 akhir konsisten naikin kualitas jawaban lebih banyak daripada utak-atik strategi chunking sebanyak apa pun.
+- **Hybrid search.** Pencarian vektor murni kesulitan sama query yang butuh kecocokan persis, kayak nomor part, kode error, dan nama orang atau tempat, yang buat pencarian kata kunci biasa gampang banget. Atlas bisa nggabungin `$vectorSearch` dengan penilaian full-text Atlas Search dalam satu pipeline, jadi dua kasus itu kecover tanpa harus jalanin dua sistem terpisah.
+- **Metadata tingkat chunk buat sitasi.** Nyimpen nomor halaman sumber bareng tiap chunk itu gratis pas ingestion, dan ngubah "nih jawabannya" jadi "nih jawabannya, liat halaman 14". Buat pengguna chatbot dokumen, itu jauh lebih penting daripada akurasi jawaban mentah.
+
+Gak ada satu pun dari ini yang aneh-aneh. Ini yang ngebedain demo yang jalan di PDF yang kamu tes dari chatbot yang beneran bisa dipercaya buat dokumen asli.

@@ -1,0 +1,63 @@
+---
+title: "Men-debug Crash LangGraph CLI yang Hanya Terjadi di Windows"
+description: "Sebuah FileNotFoundError yang hanya muncul di mesinku, dilacak sampai ke pemisah path yang tercampur di dalam dependency resolver LangGraph CLI."
+---
+
+Aku sudah tiga hari membangun agen LangGraph kecil, tidak ada yang aneh, hanya satu graph dengan beberapa node tool, ketika `langgraph dev` berhenti menyala. Bukan "berhenti bekerja dengan benar". Berhenti menyala. Di mesinku, pada proyek yang sehari sebelumnya berjalan lancar di komputer rekan satu tim yang memakai macOS.
+
+Kesenjangan itu, jalan di mereka tetapi rusak di aku dengan commit yang sama, biasanya tanda pertama bahwa yang kamu hadapi sama sekali bukan bug di kodemu.
+
+## [ 01 ] Crash-nya
+
+Dev server menyala, mencetak banner seperti biasa, lalu mati sebelum selesai memuat graph:
+
+```text title="LISTING 01 — traceback-nya"
+FileNotFoundError: [Errno 2] No such file or directory:
+'/deps/langgraph-example-pyproject/my_agent\graph.py'
+```
+
+Perhatikan path itu baik-baik. `/deps/langgraph-example-pyproject/my_agent` memakai garis miring biasa, lalu berpindah ke garis miring terbalik sebelum `graph.py`. Itu bukan salah ketik di konfigurasiku, tidak ada orang yang menulis path seperti itu secara manual. Sesuatu di dalam CLI-lah yang *menyusun* string tersebut, dan kedua bagiannya datang dari dua jalur kode berbeda yang tidak sepakat soal pemisah mana yang dipakai.
+
+<PathSeparatorDiagram
+  label="FIG. 01 — Anatomi crash"
+  caption="Dua jalur kode tidak sepakat soal pemisah mana yang dipakai, dan tabrakan itu hanya ada sebagai path filesystem di Windows: segmen pertama berasal dari penggabungan string naif yang mengasumsikan “/” POSIX, segmen kedua dari pathlib.Path yang dinormalkan Windows menjadi “\”."
+  alt="Diagram path file yang rusak, menampilkan segmen garis miring biasa yang dibangun dengan penggabungan string gaya POSIX bertemu dengan segmen garis miring terbalik dari pathlib.Path yang dinormalkan Windows, dengan ketidakcocokan ditandai di sambungannya dan panah ke FileNotFoundError yang dihasilkan."
+/>
+
+## [ 02 ] Melacak Akar Masalah
+
+<PullQuote index={1}>
+  Bug-nya bukan di graph-ku. Ia ada pada cara CLI menerjemahkan konfigurasiku menjadi path filesystem, dan hanya muncul di satu-satunya OS tempat dua konvensi pemisah itu benar-benar bertabrakan.
+</PullQuote>
+
+`langgraph dev` membaca `langgraph.json`, me-resolve entri `path` tiap graph relatif terhadap root proyek, lalu menyerahkan hasilnya ke mekanisme import Python. Di Linux dan macOS, `/` adalah satu-satunya pemisah yang ada, sehingga kode apa pun yang menyusun path dengan menggabungkan string memakai `/` kebetulan menghasilkan sesuatu yang valid. Di Windows, `pathlib` dan `os.path` dari pustaka standar menormalkan ke garis miring terbalik, tetapi hanya untuk bagian path yang benar-benar melewati keduanya. Jika satu segmen path disusun dengan penggabungan string yang naif (mengasumsikan POSIX) dan segmen lain berasal dari objek `pathlib.Path` (yang dinormalkan Windows secara otomatis), kamu mendapat persis path Frankenstein di traceback itu: bergaya POSIX sampai titik pertemuan dua segmen, garis miring terbalik sesudahnya.
+
+Ini kelas bug yang sudah dikenal di dependency resolver LangGraph CLI, dan cukup serius sampai tim LangChain merilis perbaikan khusus: sebuah pull request berjudul "[CLI] Fix relative path issue on Windows" yang menormalkan path dependensi lokal sebelum dipakai untuk pencarian file, alih-alih memercayai konvensi pemisah apa pun yang kebetulan dipakai kode pemanggilnya.
+
+## [ 03 ] Keluar dari Kebuntuan
+
+Aku punya tenggat, jadi aku tidak menunggu rilis baru merembes turun lewat lockfile-ku. Tiga hal membuatku bergerak lagi, kurang lebih sesuai urutan yang kucoba:
+
+1. **Tulis ulang path di `langgraph.json` dengan garis miring biasa.** API filesystem Windows menerima `/` di sebagian besar konteks meskipun shell menampilkan `\`. Ini saja tidak memperbaiki crash, karena bug-nya ada di resolver CLI, bukan pada cara aku menulis konfigurasi. Tetapi langkah ini menyingkirkan kemungkinan "konfigurasiku salah bentuk" dan membuatku bisa mengisolasi masalah ke alatnya sendiri.
+2. **Kunci (pin) `langgraph-cli` ke versi yang terbit setelah perbaikan path Windows masuk.** Begitu aku tahu ini regresi dari hulu dan bukan sesuatu di proyekku, upgrade adalah perbaikan yang sebenarnya, bukan solusi sementara.
+3. **Pindah ke WSL untuk dev server sambil memastikan upgrade-nya.** Menjalankan `langgraph dev` di dalam WSL menghindari seluruh kelas bug ini, karena hanya ada satu konvensi pemisah yang berlaku. Aku memakainya sebagai penahan sementara supaya tetap bisa bekerja sambil memverifikasi bahwa kenaikan versi memperbaiki masalah secara native.
+
+```text title="LISTING 02 — perbaikannya, singkatnya"
+# pyproject.toml / requirements, before
+langgraph-cli>=0.1.60
+
+# after — pinned past the Windows path-resolution fix
+langgraph-cli>=0.1.73
+```
+
+Menaikkan pin lalu menginstal ulang di virtualenv yang bersih membuat dev server menyala dengan mulus, lengkap dengan path campuran pemisahnya.
+
+## [ 04 ] Yang Akan Kukatakan pada Diriku yang Dulu
+
+Beberapa hal dari kasus ini berlaku jauh melampaui LangGraph:
+
+- **String path dengan pemisah campuran tidak pernah kebetulan.** Ia adalah struk yang menunjukkan persis di mana dua potong kode berbeda pendapat soal platform tempat mereka berjalan. Bacalah apa adanya sebelum mulai menebak-nebak.
+- **"Jalan di mesin mereka" adalah data, bukan tuduhan.** Begitu sebuah bug bergantung pada OS, ruang pencariannya menyusut drastis. Kamu tidak lagi mencari kesalahan logika, kamu mencari asumsi platform.
+- **Cek issue tracker sebelum menganggap kamu orang pertama yang mengalaminya.** Penanganan path lintas platform adalah sumber bug abadi di CLI mana pun yang basis kontributornya kebanyakan bukan pengguna Windows. Peluangnya cukup besar bahwa seseorang sudah melaporkannya, dan sering kali sudah memperbaikinya.
+
+Aku masih mengembangkan terutama di Windows, dan aku masih sesekali menemui alat yang jelas hanya pernah diuji di Unix. Solusinya jarang berupa berganti sistem operasi. Solusinya adalah terbiasa membaca traceback dengan cukup teliti untuk membedakan "kodeku yang salah" dari "asumsi alat ini tidak berlaku di sini".

@@ -77,15 +77,23 @@ function Arrow({
   );
 }
 
-export function RagArchitectureDiagram() {
+const DEFAULT_LABEL = 'FIG. 01 — Architecture';
+const DEFAULT_CAPTION =
+  'Ingestion writes chunks and vectors into the same Atlas collection that $vectorSearch reads at query time — one store, one query, both similarity and metadata filtering.';
+const DEFAULT_ALT =
+  'Diagram showing a PDF chunked and embedded into a MongoDB Atlas vector index, with an incoming question embedded and joined into a $vectorSearch query against that same index before being passed to Gemini for the final answer.';
+
+type Props = { label?: string; caption?: string; alt?: string };
+
+export function RagArchitectureDiagram({ label, caption, alt }: Props) {
   return (
     <DiagramFigure
-      label="FIG. 01 — Architecture"
-      caption="Ingestion writes chunks and vectors into the same Atlas collection that $vectorSearch reads at query time — one store, one query, both similarity and metadata filtering.">
+      label={label ?? DEFAULT_LABEL}
+      caption={caption ?? DEFAULT_CAPTION}>
       <svg
         viewBox="0 0 990 250"
         role="img"
-        aria-label="Diagram showing a PDF chunked and embedded into a MongoDB Atlas vector index, with an incoming question embedded and joined into a $vectorSearch query against that same index before being passed to Gemini for the final answer."
+        aria-label={alt ?? DEFAULT_ALT}
         style={{ maxWidth: '100%', height: 'auto' }}
         className="text-foreground">
         <defs>

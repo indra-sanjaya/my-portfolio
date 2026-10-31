@@ -1,14 +1,22 @@
 import { DiagramFigure } from './diagram-figure';
 
-export function PathSeparatorDiagram() {
+const DEFAULT_LABEL = 'FIG. 01 — Anatomy of the crash';
+const DEFAULT_CAPTION =
+  'Two code paths disagree about which separator to use, and the collision only exists as a filesystem path on Windows: the first segment comes from naive string-joining that assumes POSIX \'/\', the second from a pathlib.Path that Windows normalizes to \'\\\\\'.';
+const DEFAULT_ALT =
+  'Diagram of the broken file path, showing the forward-slash segment built by naive POSIX-style string joining meeting the backslash segment built by Windows-normalized pathlib.Path, with the mismatch marked at the seam and an arrow down to the resulting FileNotFoundError.';
+
+type Props = { label?: string; caption?: string; alt?: string };
+
+export function PathSeparatorDiagram({ label, caption, alt }: Props) {
   return (
     <DiagramFigure
-      label="FIG. 01 — Anatomy of the crash"
-      caption="Two code paths disagree about which separator to use, and the collision only exists as a filesystem path on Windows: the first segment comes from naive string-joining that assumes POSIX '/', the second from a pathlib.Path that Windows normalizes to '\\'.">
+      label={label ?? DEFAULT_LABEL}
+      caption={caption ?? DEFAULT_CAPTION}>
       <svg
         viewBox="0 0 900 230"
         role="img"
-        aria-label="Diagram of the broken file path, showing the forward-slash segment built by naive POSIX-style string joining meeting the backslash segment built by Windows-normalized pathlib.Path, with the mismatch marked at the seam and an arrow down to the resulting FileNotFoundError."
+        aria-label={alt ?? DEFAULT_ALT}
         style={{ maxWidth: '100%', height: 'auto' }}
         className="text-foreground">
         <defs>
