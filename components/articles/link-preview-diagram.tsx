@@ -1,15 +1,23 @@
 import { DiagramFigure } from './diagram-figure';
 import { ArrowMarker, DiagramArrow, DiagramTag } from './diagram-primitives';
 
-export function LinkPreviewDiagram() {
+const DEFAULT_LABEL = 'FIG. 04 — Anatomy of a link preview';
+const DEFAULT_CAPTION =
+  'Left: with no usable tags, a platform can only guess from the URL. Right: the same link once og:image, og:title and og:description exist. Platforms may fall back to <title> and the meta description, but results vary — an explicit og:image is the only reliable way to control the preview image.';
+const DEFAULT_ALT =
+  'Two link-preview cards side by side. The left card, without metadata, shows only a placeholder image box and a bare URL. The right card, with metadata, shows an og:image, an og:title, an og:description and the site domain.';
+
+type Props = { label?: string; caption?: string; alt?: string };
+
+export function LinkPreviewDiagram({ label, caption, alt }: Props) {
   return (
     <DiagramFigure
-      label="FIG. 04 — Anatomy of a link preview"
-      caption="Left: with no usable tags, a platform can only guess from the URL. Right: the same link once og:image, og:title and og:description exist. Platforms may fall back to <title> and the meta description, but results vary — an explicit og:image is the only reliable way to control the preview image.">
+      label={label ?? DEFAULT_LABEL}
+      caption={caption ?? DEFAULT_CAPTION}>
       <svg
         viewBox="0 0 800 300"
         role="img"
-        aria-label="Two link-preview cards side by side. The left card, without metadata, shows only a placeholder image box and a bare URL. The right card, with metadata, shows an og:image, an og:title, an og:description and the site domain."
+        aria-label={alt ?? DEFAULT_ALT}
         style={{ maxWidth: '100%', height: 'auto' }}
         className="min-w-[620px] text-foreground">
         <defs>

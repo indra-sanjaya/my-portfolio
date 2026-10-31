@@ -1,15 +1,23 @@
 import { DiagramFigure } from './diagram-figure';
 import { ArrowMarker, DiagramArrow, DiagramBox, DiagramTag } from './diagram-primitives';
 
-export function MetadataAudiencesDiagram() {
+const DEFAULT_LABEL = 'FIG. 01 — One page, three readers';
+const DEFAULT_CAPTION =
+  'The rendered UI is only one half of a page. The <head> carries a second layer of information that humans never see, but that search engines and link-preview crawlers depend on.';
+const DEFAULT_ALT =
+  'Diagram of a single web page split into two layers. The rendered UI layer is read by humans. The head metadata layer, containing title, description, Open Graph and structured data, is read by search engines and by crawlers and social platforms.';
+
+type Props = { label?: string; caption?: string; alt?: string };
+
+export function MetadataAudiencesDiagram({ label, caption, alt }: Props) {
   return (
     <DiagramFigure
-      label="FIG. 01 — One page, three readers"
-      caption="The rendered UI is only one half of a page. The <head> carries a second layer of information that humans never see, but that search engines and link-preview crawlers depend on.">
+      label={label ?? DEFAULT_LABEL}
+      caption={caption ?? DEFAULT_CAPTION}>
       <svg
         viewBox="0 0 780 372"
         role="img"
-        aria-label="Diagram of a single web page split into two layers. The rendered UI layer is read by humans. The head metadata layer, containing title, description, Open Graph and structured data, is read by search engines and by crawlers and social platforms."
+        aria-label={alt ?? DEFAULT_ALT}
         style={{ maxWidth: '100%', height: 'auto' }}
         className="min-w-[620px] text-foreground">
         <defs>

@@ -16,15 +16,23 @@ const STAGES = [
   },
 ] as const;
 
-export function MetadataPipelineDiagram() {
+const DEFAULT_LABEL = 'FIG. 03 — Where each signal acts';
+const DEFAULT_CAPTION =
+  'Metadata is not one mechanism but several, each acting at a different stage. robots.txt controls fetching, not indexing — a page blocked from crawling can never be seen saying noindex, so the two must not be mixed up.';
+const DEFAULT_ALT =
+  'Four-stage pipeline: Discover, Crawl, Index, Display. Under each stage are the signals that act there: sitemap and links for discovery, robots.txt for crawling, title, description, canonical, noindex and structured data for indexing, and Open Graph, Twitter Cards, search snippets for display.';
+
+type Props = { label?: string; caption?: string; alt?: string };
+
+export function MetadataPipelineDiagram({ label, caption, alt }: Props) {
   return (
     <DiagramFigure
-      label="FIG. 03 — Where each signal acts"
-      caption="Metadata is not one mechanism but several, each acting at a different stage. robots.txt controls fetching, not indexing — a page blocked from crawling can never be seen saying noindex, so the two must not be mixed up.">
+      label={label ?? DEFAULT_LABEL}
+      caption={caption ?? DEFAULT_CAPTION}>
       <svg
         viewBox="0 0 800 300"
         role="img"
-        aria-label="Four-stage pipeline: Discover, Crawl, Index, Display. Under each stage are the signals that act there: sitemap and links for discovery, robots.txt for crawling, title, description, canonical, noindex and structured data for indexing, and Open Graph, Twitter Cards, search snippets for display."
+        aria-label={alt ?? DEFAULT_ALT}
         style={{ maxWidth: '100%', height: 'auto' }}
         className="min-w-[640px] text-foreground">
         <defs>
