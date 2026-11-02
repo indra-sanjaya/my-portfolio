@@ -158,16 +158,16 @@ export function CertificationsSection() {
             delay: 0.1,
             duration: durationFast,
           }}
-          className="mb-14">
+          className="mb-16">
           <div className="flex items-center gap-4 mb-4">
             <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
               <Award className="w-6 h-6 text-primary" />
             </div>
 
             <div>
-              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">Certifications</p>
+              <p className="section-eyebrow">Certifications</p>
 
-              <h2 className="text-[clamp(1.9rem,4.2vw,2.5rem)] font-bold tracking-tight">
+              <h2 className="section-title mt-1">
                 Verified Skills & Achievements
               </h2>
             </div>

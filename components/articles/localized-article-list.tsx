@@ -1,10 +1,11 @@
 'use client';
 
-import { articlePath, DEFAULT_LANG, UI } from '@/lib/article-i18n';
+import { UI } from '@/lib/article-i18n';
 import type { LocalizedArticle } from '@/lib/articles';
 import { useArticleLang } from '@/hooks/use-article-lang';
 import { ArticleLedger } from './article-ledger';
-import { FeaturedEntry, type ListedArticle } from './featured-entry';
+import { FeaturedEntry } from './featured-entry';
+import { localizeArticles } from './localize';
 import { ListLanguageSwitch } from './language-switch';
 
 /**
@@ -21,16 +22,7 @@ export function LocalizedArticleList({
   const [lang, setLang] = useArticleLang();
   const t = UI[lang];
 
-  const listed: ListedArticle[] = articles.map((article) => {
-    const translation = article.translations[lang];
-    const effective = translation ? lang : DEFAULT_LANG;
-    return {
-      ...article,
-      ...(translation ?? article.translations[DEFAULT_LANG]),
-      href: articlePath(article.slug, effective),
-      onlyEnglish: lang !== DEFAULT_LANG && !translation,
-    };
-  });
+  const listed = localizeArticles(articles, lang);
 
   const featured = listed.find((article) => article.slug === featuredSlug) ?? null;
   const rest = featured ? listed.filter((article) => article.slug !== featured.slug) : listed;

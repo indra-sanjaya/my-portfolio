@@ -380,9 +380,9 @@ export function TechStackSection() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration }}
           className="mb-16">
-          <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground">Technologies</span>
+          <span className="section-eyebrow">Technologies</span>
 
-          <h2 className="mt-4 text-[clamp(2rem,4.8vw,3.2rem)] font-bold tracking-tight text-foreground">
+          <h2 className="section-title mt-4">
             Skills, Tech Stack & AI Integration
           </h2>
 

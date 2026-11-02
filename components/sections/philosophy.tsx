@@ -67,7 +67,7 @@ export function PhilosophySection() {
       transition: {
         duration: durationFast,
         delay: i * 0.08,
-        ease: [0.25, 0.1, 0.25, 1],
+        ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
       },
     }),
   };
@@ -87,7 +87,7 @@ export function PhilosophySection() {
       animate={isInView ? 'visible' : 'hidden'}
       variants={{
         hidden: { opacity: 0, y: 40 },
-        visible: { opacity: 1, y: 0, transition: { duration, ease: [0.25, 0.1, 0.25, 1] } },
+        visible: { opacity: 1, y: 0, transition: { duration, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } },
       }}>
       {/* subtle background glow */}
       <div className="absolute inset-0 pointer-events-none">
@@ -101,10 +101,10 @@ export function PhilosophySection() {
           custom={0}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="mb-20">
-          <span className="text-xs tracking-[0.3em] uppercase text-muted-foreground">Philosophy</span>
+          className="mb-16">
+          <span className="section-eyebrow">Philosophy</span>
 
-          <h2 className="mt-4 text-[clamp(2rem,4.8vw,3.1rem)] font-bold tracking-tight text-foreground">
+          <h2 className="section-title mt-4">
             My Engineering Mindset
           </h2>
 

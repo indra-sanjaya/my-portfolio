@@ -45,7 +45,7 @@ export function ImpactSection() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration, ease: [0.25, 0.1, 0.25, 1] },
+      transition: { duration, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
     },
   };
 
@@ -57,7 +57,7 @@ export function ImpactSection() {
       transition: {
         duration: durationFast,
         delay: i * 0.12,
-        ease: [0.25, 0.1, 0.25, 1],
+        ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
       },
     }),
   };
@@ -73,9 +73,9 @@ export function ImpactSection() {
       <div className="content-container">
         {/* HEADER */}
         <motion.div variants={itemVariants} custom={0} className="mb-16">
-          <span className="text-xs tracking-widest uppercase text-muted-foreground">Engineering Impact</span>
+          <span className="section-eyebrow">Engineering Impact</span>
 
-          <h2 className="mt-4 text-[clamp(2rem,4.6vw,3rem)] font-semibold tracking-tight text-foreground">
+          <h2 className="section-title mt-4">
             Measurable Industrial Outcomes
           </h2>
 

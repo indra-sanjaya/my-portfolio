@@ -45,7 +45,7 @@ export function ContactSection() {
       transition: {
         duration,
         delay: 0.25 + i * 0.1,
-        ease: [0.25, 0.1, 0.25, 1],
+        ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
       },
     }),
   };
@@ -57,14 +57,14 @@ export function ContactSection() {
       ref={ref}
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration, ease: [0.25, 0.1, 0.25, 1] }}>
+      transition={{ duration, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}>
       <div className="content-container">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}>
-            <span className="text-xs tracking-widest uppercase text-muted-foreground">Contact</span>
+            transition={{ duration, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}>
+            <span className="section-eyebrow">Contact</span>
             <div className="mt-6 mb-8 flex items-center gap-4">
               <div className="relative shrink-0">
                 <img
@@ -80,7 +80,7 @@ export function ContactSection() {
                 <p className="text-xs text-muted-foreground">Enthusiast, Optimist, Problem Solver and Curious Mind</p>
               </div>
             </div>
-            <h2 className="mt-4 text-[clamp(2rem,5.2vw,3.1rem)] font-medium tracking-tight text-foreground text-balance">
+            <h2 className="section-title mt-4 text-balance">
               Let&apos;s build something impactful
             </h2>
             <p className="mt-5 text-[clamp(1rem,2.3vw,1.125rem)] text-muted-foreground leading-relaxed">

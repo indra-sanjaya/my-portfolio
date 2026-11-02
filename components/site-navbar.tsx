@@ -31,11 +31,11 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'about', label: 'About', icon: User },
   { id: 'impact', label: 'Impact', icon: TrendingUp },
   { id: 'projects', label: 'Projects', icon: FolderKanban },
+  { id: 'articles', label: 'Articles', icon: BookOpen },
   { id: 'philosophy', label: 'Approach', icon: Lightbulb },
   { id: 'tech-stack', label: 'Stack', icon: Layers },
   { id: 'certifications', label: 'Certifications', icon: Award },
   { id: 'contact', label: 'Contact', icon: Mail },
-  { id: 'articles', label: 'Articles', icon: BookOpen, href: '/articles' },
 ];
 
 const ARTICLES_ROUTE_NAV_ITEMS: NavItem[] = [
@@ -82,7 +82,9 @@ export function SiteNavbar() {
       if (!onArticlesRoute) setActiveSection(getActiveSection());
     };
 
-    const onResize = () => setActiveSection(getActiveSection());
+    const onResize = () => {
+      if (!onArticlesRoute) setActiveSection(getActiveSection());
+    };
 
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -100,7 +102,7 @@ export function SiteNavbar() {
       window.removeEventListener('resize', onResize);
       media.removeEventListener('change', closeOnDesktop);
     };
-  }, []);
+  }, [onArticlesRoute]);
 
   const isLight = mounted && theme === 'light';
 

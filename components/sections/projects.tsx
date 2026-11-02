@@ -30,7 +30,7 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
       y: 0,
       transition: {
         duration,
-        ease: [0.25, 0.1, 0.25, 1],
+        ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
       },
     },
   };
@@ -82,12 +82,12 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
             <div className="flex flex-wrap gap-2 pt-2">
               {project.techStack.slice(0, 6).map((tech, index) => {
                 const colors = [
-                  'bg-blue-500/10 text-blue-300 border-blue-500/20',
-                  'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
-                  'bg-purple-500/10 text-purple-300 border-purple-500/20',
-                  'bg-amber-500/10 text-amber-300 border-amber-500/20',
-                  'bg-pink-500/10 text-pink-300 border-pink-500/20',
-                  'bg-cyan-500/10 text-cyan-300 border-cyan-500/20',
+                  'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20',
+                  'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20',
+                  'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20',
+                  'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20',
+                  'bg-pink-500/10 text-pink-700 dark:text-pink-300 border-pink-500/20',
+                  'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/20',
                 ];
 
                 const colorClass = colors[index % colors.length];
@@ -161,8 +161,8 @@ export function ProjectsSection() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: durationFast }}
           className="mb-16">
-          <span className="text-xs tracking-widest uppercase text-muted-foreground">Selected Work</span>
-          <h2 className="mt-4 text-[clamp(2.4rem,6vw,3.6rem)] font-bold tracking-tight leading-tight text-foreground">
+          <span className="section-eyebrow">Selected Work</span>
+          <h2 className="section-title mt-4">
             Projects
           </h2>
         </motion.div>

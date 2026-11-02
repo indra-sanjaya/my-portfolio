@@ -1,6 +1,8 @@
 import { HeroSection } from '@/components/sections/hero';
 import { ImpactSection } from '@/components/sections/impact';
 import { ProjectsSection } from '@/components/sections/projects';
+import { ArticlesSection } from '@/components/sections/articles';
+import { getAllLocalizedArticles } from '@/lib/articles';
 import { AboutSection } from '@/components/sections/about';
 import { PhilosophySection } from '@/components/sections/philosophy';
 import { TechStackSection } from '@/components/sections/tech-stack';
@@ -23,6 +25,8 @@ const personJsonLd = {
 };
 
 export default function Home() {
+  const articles = getAllLocalizedArticles();
+
   return (
     <>
       <script
@@ -41,6 +45,7 @@ export default function Home() {
         <AboutSection />
         <ImpactSection />
         <ProjectsSection />
+        <ArticlesSection articles={articles} />
         <PhilosophySection />
         <TechStackSection />
         <CertificationsSection />

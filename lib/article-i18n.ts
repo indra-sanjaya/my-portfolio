@@ -37,6 +37,10 @@ type UiStrings = {
   empty: string;
   language: string;
   onlyEnglish: string;
+  homeEyebrow: string;
+  homeTitle: string;
+  homeSubtitle: string;
+  viewAll: string;
 };
 
 export const UI: Record<Lang, UiStrings> = {
@@ -57,6 +61,10 @@ export const UI: Record<Lang, UiStrings> = {
     empty: 'No entries logged yet. Check back soon.',
     language: 'Language',
     onlyEnglish: 'EN only',
+    homeEyebrow: 'Writing',
+    homeTitle: 'Field Notes & Articles',
+    homeSubtitle: 'Practical write-ups on web engineering, AI systems and real debugging stories, in English and Indonesian.',
+    viewAll: 'View all articles',
   },
   id: {
     fieldLog: 'Catatan Lapangan',
@@ -75,6 +83,10 @@ export const UI: Record<Lang, UiStrings> = {
     empty: 'Belum ada tulisan. Silakan cek lagi nanti.',
     language: 'Bahasa',
     onlyEnglish: 'Hanya EN',
+    homeEyebrow: 'Tulisan',
+    homeTitle: 'Catatan Lapangan & Artikel',
+    homeSubtitle: 'Tulisan praktis tentang rekayasa web, sistem AI, dan kisah debugging nyata, dalam bahasa Inggris dan Indonesia.',
+    viewAll: 'Lihat semua artikel',
   },
   gaul: {
     fieldLog: 'Catatan Lapangan',
@@ -93,5 +105,9 @@ export const UI: Record<Lang, UiStrings> = {
     empty: 'Belum ada tulisan nih. Mampir lagi nanti ya!',
     language: 'Bahasa',
     onlyEnglish: 'EN doang',
+    homeEyebrow: 'Tulisan',
+    homeTitle: 'Catatan Lapangan & Artikel',
+    homeSubtitle: 'Tulisan seru soal web engineering, sistem AI, sama cerita debugging beneran, ada versi Inggris dan Indonesia.',
+    viewAll: 'Lihat semua artikel',
   },
 };

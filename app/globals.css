@@ -160,6 +160,22 @@
     padding-block: clamp(4.5rem, 8vw, 8rem);
   }
 
+  .section-eyebrow {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4.6vw, 3rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: var(--foreground);
+  }
+
   .section-y-tight {
     padding-block: clamp(3.5rem, 6vw, 6.5rem);
   }

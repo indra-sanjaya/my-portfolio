@@ -92,7 +92,7 @@ export function AboutSection() {
       <div className="relative content-container">
         {/* Header — same rhythm as Impact: eyebrow, headline with a point of view, one supporting line */}
         <motion.div variants={itemVariants} custom={0} initial="hidden" animate={animate} className="mb-12 sm:mb-16">
-          <span className="text-xs tracking-widest uppercase text-muted-foreground">Background</span>
+          <span className="section-eyebrow">Background</span>
           <h2 className="mt-4 text-[clamp(2rem,4.6vw,3rem)] font-semibold tracking-tight text-foreground">
             From Industrial Sites to Production Code
           </h2>
