@@ -1,17 +1,21 @@
 import { projectsData } from '@/lib/projects-data';
 import { getArticleChatSummaries } from '@/lib/articles';
+import { certifications, journey, TECH_STACK } from '@/lib/profile-data';
 
 const BIO = `
-Indra Sanjaya — Software Developer with an engineering background.
+Indra Sanjaya — Fullstack Engineer with an engineering background.
 
 Background: 8+ years of environmental and HSE engineering experience across oil & gas
 and industrial sectors in Indonesia, including BP Tangguh LNG, PT Pupuk Kalimantan Timur,
-and PT Pertamina Hulu Mahakam. More recently completed a full-stack software development
-program at Hacktiv8 and has transitioned into building modern web applications and
-AI-powered systems.
+and PT Pertamina Hulu Mahakam. Completed the Hacktiv8 full-stack software development
+program, then moved into software engineering.
 
-Currently working in Material Management, and open to opportunities in both
-software engineering / AI-adjacent roles and HSE / environmental engineering roles.
+Current role: Fullstack Engineer building telecommunications systems (since September 2026).
+He also builds his own full-stack and AI-powered projects (see PROJECTS) and writes technical
+articles (see ARTICLES).
+
+Open to opportunities in both software engineering / AI-adjacent roles and HSE / environmental
+engineering roles. Open to placement anywhere in Indonesia.
 
 Location: Jakarta, Indonesia.
 `;
@@ -34,6 +38,28 @@ Contact:
 - Instagram: https://www.instagram.com/indra_isanjaya
 - CV downloadable directly from the site's contact section
 `;
+
+function formatJourney(): string {
+  return journey.map((step) => `- ${step.year}: ${step.title}. ${step.description}`).join('\n');
+}
+
+function formatSkills(): string {
+  return TECH_STACK.map((group) => `- ${group.category}: ${group.items.join(', ')}`).join('\n');
+}
+
+function formatCertifications(): string {
+  const featured = certifications.filter((cert) => cert.featured);
+  const byIssuer = new Map<string, string[]>();
+  certifications
+    .filter((cert) => !cert.featured)
+    .forEach((cert) => {
+      byIssuer.set(cert.issuer, [...(byIssuer.get(cert.issuer) ?? []), `${cert.title} (${cert.earnedOn})`]);
+    });
+
+  const lines = featured.map((cert) => `- ${cert.title} — ${cert.issuer} (${cert.earnedOn})`);
+  byIssuer.forEach((titles, issuer) => lines.push(`- ${issuer}: ${titles.join('; ')}`));
+  return lines.join('\n');
+}
 
 function formatProjects(): string {
   return projectsData
@@ -74,7 +100,8 @@ Your job is to answer visitor questions — mostly recruiters, hiring managers, 
 fellow developers — about Indra's background, skills, and projects.
 
 STRICT RULES:
-1. Only answer using the information provided below. Do not invent experience,
+1. Only answer using the information provided below (BIO, CAREER JOURNEY, SKILLS, CERTIFICATIONS,
+   IMPACT METRICS, PROJECTS, ARTICLES, CONTACT). Do not invent experience,
    dates, companies, or metrics that are not explicitly stated here.
 2. If asked something you don't have information on (e.g. availability, salary
    expectations, personal opinions on unrelated topics), say you don't have that
@@ -92,6 +119,18 @@ STRICT RULES:
 
 === BIO ===
 ${BIO}
+
+=== CAREER JOURNEY ===
+${formatJourney()}
+
+=== SKILLS & TECH STACK ===
+These are skills Indra lists on his portfolio. If a visitor asks whether he can use a language,
+framework or tool, check this list and the PROJECTS below first. If it is listed, answer yes and
+say where it appears. Only say he does not have a skill when it is genuinely absent from all sections.
+${formatSkills()}
+
+=== CERTIFICATIONS ===
+${formatCertifications()}
 
 === IMPACT METRICS ===
 ${IMPACT_METRICS}

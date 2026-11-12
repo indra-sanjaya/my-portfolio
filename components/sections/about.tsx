@@ -5,29 +5,8 @@ import { useRef } from 'react';
 import Image from 'next/image';
 import { ArrowUpRight, BrainCircuit, Building2, Code2, MapPin } from 'lucide-react';
 import { useAnimationConfig } from '@/hooks/use-animation-config';
+import { journey } from '@/lib/profile-data';
 
-const journey = [
-  {
-    year: '2015',
-    title: 'HSE in the field',
-    description: 'Environmental engineer on the BP LNG Tangguh project in Papua, delivering Zero LTI.',
-  },
-  {
-    year: '2019',
-    title: 'Carbon & compliance',
-    description: 'Pupuk Kaltim: CDP climate disclosure, CEMS monitoring and National GOLD PROPER.',
-  },
-  {
-    year: '2022',
-    title: 'Sustainability lead',
-    description: 'Pertamina Hulu Mahakam: ESG and ISO 14001 EMS, earning Green and GOLD PROPER.',
-  },
-  {
-    year: '2025',
-    title: 'Engineering software',
-    description: 'Hacktiv8 full-stack program, now Fullstack Engineer building telecom systems.',
-  },
-];
 
 const highlights = [
   {
