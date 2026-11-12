@@ -1,43 +1,32 @@
 import { projectsData } from '@/lib/projects-data';
 import { getArticleChatSummaries } from '@/lib/articles';
-import { certifications, journey, TECH_STACK } from '@/lib/profile-data';
+import { certifications, CONTACT_LINKS, IMPACT_METRICS, journey, PROFILE, TECH_STACK } from '@/lib/profile-data';
 
-const BIO = `
-Indra Sanjaya — Fullstack Engineer with an engineering background.
+function formatBio(): string {
+  return `
+${PROFILE.name} — ${PROFILE.headline}.
 
-Background: 8+ years of environmental and HSE engineering experience across oil & gas
-and industrial sectors in Indonesia, including BP Tangguh LNG, PT Pupuk Kalimantan Timur,
-and PT Pertamina Hulu Mahakam. Completed the Hacktiv8 full-stack software development
-program, then moved into software engineering.
+Background: ${PROFILE.background}
 
-Current role: Fullstack Engineer building telecommunications systems (since September 2026).
-He also builds his own full-stack and AI-powered projects (see PROJECTS) and writes technical
-articles (see ARTICLES).
+Current role: ${PROFILE.currentRole}. ${PROFILE.alongside}
 
-Open to opportunities in both software engineering / AI-adjacent roles and HSE / environmental
-engineering roles. Open to placement anywhere in Indonesia.
+${PROFILE.openTo}
 
-Location: Jakarta, Indonesia.
-`;
+Location: ${PROFILE.location}.
+`.trim();
+}
 
-const IMPACT_METRICS = `
-Key measurable outcomes:
-- 700K+ tons CO2e emissions reduction impact from industrial sustainability initiatives
-- Zero Lost Time Incidents (LTI) across high-risk LNG construction environments
-- GOLD PROPER certification — top-tier environmental compliance recognition
-- 4 full-stack production applications shipped (auth, databases, APIs, deployment)
-- 3 AI integrations built using Gemini-powered features (storyboarding, itinerary generation, content automation)
-- ~90% test coverage (Jest + Supertest) on backend systems
-`;
+function formatImpact(): string {
+  return ['Key measurable outcomes:', ...IMPACT_METRICS.map((metric) => `- ${metric.headline}`)].join('\n');
+}
 
-const CONTACT = `
-Contact:
-- Email: indrasanjaya.ind@gmail.com
-- LinkedIn: https://www.linkedin.com/in/indra-sanjaya-dev
-- GitHub: https://github.com/indra-sanjaya
-- Instagram: https://www.instagram.com/indra_isanjaya
-- CV downloadable directly from the site's contact section
-`;
+function formatContact(): string {
+  const links = CONTACT_LINKS.map((link) => {
+    const target = link.href.startsWith('mailto:') ? link.href.replace('mailto:', '') : link.href;
+    return `- ${link.label}: ${target}`;
+  });
+  return ['Contact:', ...links, "- CV downloadable directly from the site's contact section"].join('\n');
+}
 
 function formatJourney(): string {
   return journey.map((step) => `- ${step.year}: ${step.title}. ${step.description}`).join('\n');
@@ -118,7 +107,7 @@ STRICT RULES:
    article by title and include its URL so the visitor can read it.
 
 === BIO ===
-${BIO}
+${formatBio()}
 
 === CAREER JOURNEY ===
 ${formatJourney()}
@@ -133,7 +122,7 @@ ${formatSkills()}
 ${formatCertifications()}
 
 === IMPACT METRICS ===
-${IMPACT_METRICS}
+${formatImpact()}
 
 === PROJECTS ===
 ${formatProjects()}
@@ -142,6 +131,6 @@ ${formatProjects()}
 ${formatArticles()}
 
 === CONTACT ===
-${CONTACT}
+${formatContact()}
 `.trim();
 }

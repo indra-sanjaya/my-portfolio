@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 
 import { useAnimationConfig } from '@/hooks/use-animation-config';
+import { TECH_STACK } from '@/lib/profile-data';
 
 import {
   SiJavascript,
@@ -75,285 +76,73 @@ type Category = {
   technologies: Tech[];
 };
 
-const categories: Category[] = [
-  {
-    title: 'Languages',
-    description: 'Core programming languages used across frontend and backend development.',
-    categoryIcon: <Code2 className="w-6 h-6" />,
-    categoryIconColor: '#F59E0B',
-    technologies: [
-      {
-        name: 'JavaScript',
-        icon: <SiJavascript />,
-        color: '#F7DF1E',
-      },
-      {
-        name: 'TypeScript',
-        icon: <SiTypescript />,
-        color: '#3178C6',
-      },
-      {
-        name: 'Go (Golang)',
-        icon: <SiGo />,
-        color: '#00ADD8',
-      },
-    ],
-  },
+const techVisuals: Record<string, { icon: React.ReactNode; color: string }> = {
+  'JavaScript': { icon: <SiJavascript />, color: '#F7DF1E' },
+  'TypeScript': { icon: <SiTypescript />, color: '#3178C6' },
+  'Go (Golang)': { icon: <SiGo />, color: '#00ADD8' },
+  'React': { icon: <SiReact />, color: '#61DAFB' },
+  'Next.js': { icon: <SiNextdotjs />, color: '#ffffff' },
+  'Tailwind CSS': { icon: <SiTailwindcss />, color: '#38BDF8' },
+  'Node.js': { icon: <SiNodedotjs />, color: '#68A063' },
+  'Express': { icon: <SiExpress />, color: '#ffffff' },
+  'GraphQL': { icon: <SiGraphql />, color: '#E10098' },
+  'Apollo Client': { icon: <SiApollographql />, color: '#311C87' },
+  'PostgreSQL': { icon: <SiPostgresql />, color: '#336791' },
+  'MongoDB': { icon: <SiMongodb />, color: '#47A248' },
+  'Redis': { icon: <SiRedis />, color: '#DC382D' },
+  'Sequelize': { icon: <SiSequelize />, color: '#52B0E7' },
+  'bcryptjs': { icon: <FaUserLock />, color: '#F59E0B' },
+  'Express Session': { icon: <MdOutlineAccountBox />, color: '#10B981' },
+  'JsonWebToken': { icon: <IoIosLock />, color: '#F59E0B' },
+  'React Native': { icon: <FaMobileAlt />, color: '#61DAFB' },
+  'Expo': { icon: <SiExpo />, color: '#ffffff' },
+  'React Navigation': { icon: <LiaReact />, color: '#61DAFB' },
+  'Expo Secure Store': { icon: <IoIosLock />, color: '#A855F7' },
+  'EAS Build': { icon: <FaBoxes />, color: '#F97316' },
+  'ISO 14001 EMS': { icon: <Award className="w-4 h-4" />, color: '#10B981' },
+  'CEMS Monitoring': { icon: <Activity className="w-4 h-4" />, color: '#22C55E' },
+  'Environmental Risk Assessment': { icon: <AlertTriangle className="w-4 h-4" />, color: '#F59E0B' },
+  'ESG Compliance & Reporting': { icon: <ClipboardCheck className="w-4 h-4" />, color: '#16A34A' },
+  'HSE Inspection & Auditing': { icon: <ShieldCheck className="w-4 h-4" />, color: '#EF4444' },
+  'Procurement & Vendor Management': { icon: <Handshake className="w-4 h-4" />, color: '#F97316' },
+  'MRP & Inventory Optimization': { icon: <Warehouse className="w-4 h-4" />, color: '#8B5CF6' },
+  'Supplier Negotiation & Contracts': { icon: <FileSignature className="w-4 h-4" />, color: '#0EA5E9' },
+  'Purchasing & Cost Analysis': { icon: <Calculator className="w-4 h-4" />, color: '#F59E0B' },
+  'SAP': { icon: <SiSap />, color: '#0FAAFF' },
+  'Gemini API': { icon: <SiGooglegemini />, color: '#8E75FF' },
+  'OpenAI API': { icon: <SiOpenai />, color: '#10A37F' },
+  'Vercel AI SDK': { icon: <SiVercel />, color: '#ffffff' },
+  'LangChain': { icon: <SiLangchain />, color: '#1C64F2' },
+  'Prompt Engineering': { icon: <Sparkles className="w-4 h-4" />, color: '#F59E0B' },
+  'RAG Systems': { icon: <BrainCircuit className="w-4 h-4" />, color: '#8B5CF6' },
+  'AI Chat Interfaces': { icon: <Bot className="w-4 h-4" />, color: '#06B6D4' },
+  'Semantic Search': { icon: <DatabaseZap className="w-4 h-4" />, color: '#EC4899' },
+  'Context Management': { icon: <Layers3 className="w-4 h-4" />, color: '#22C55E' },
+};
 
-  {
-    title: 'Frontend',
-    description: 'Modern UI frameworks and styling technologies for responsive applications.',
-    categoryIcon: <SiReact className="w-6 h-6" />,
-    categoryIconColor: '#38BDF8',
-    technologies: [
-      {
-        name: 'React',
-        icon: <SiReact />,
-        color: '#61DAFB',
-      },
-      {
-        name: 'Next.js',
-        icon: <SiNextdotjs />,
-        color: '#ffffff',
-      },
-      {
-        name: 'Tailwind CSS',
-        icon: <SiTailwindcss />,
-        color: '#38BDF8',
-      },
-    ],
-  },
+const categoryVisuals: Record<string, { categoryIcon: React.ReactNode; categoryIconColor: string }> = {
+  'Languages': { categoryIcon: <Code2 className="w-6 h-6" />, categoryIconColor: '#F59E0B' },
+  'Frontend': { categoryIcon: <SiReact className="w-6 h-6" />, categoryIconColor: '#38BDF8' },
+  'Backend & APIs': { categoryIcon: <SiNodedotjs className="w-6 h-6" />, categoryIconColor: '#22C55E' },
+  'Databases & ORM': { categoryIcon: <Database className="w-6 h-6" />, categoryIconColor: '#8B5CF6' },
+  'Authentication & Security': { categoryIcon: <ShieldCheck className="w-6 h-6" />, categoryIconColor: '#EF4444' },
+  'Mobile Development': { categoryIcon: <Smartphone className="w-6 h-6" />, categoryIconColor: '#06B6D4' },
+  'Engineering & Sustainability': { categoryIcon: <Leaf className="w-6 h-6" />, categoryIconColor: '#10B981' },
+  'AI & LLM Integration': { categoryIcon: <Brain className="w-6 h-6" />, categoryIconColor: '#A855F7' },
+};
 
-  {
-    title: 'Backend & APIs',
-    description: 'Server-side technologies, APIs, and scalable architecture.',
-    categoryIcon: <SiNodedotjs className="w-6 h-6" />,
-    categoryIconColor: '#22C55E',
-    technologies: [
-      {
-        name: 'Node.js',
-        icon: <SiNodedotjs />,
-        color: '#68A063',
-      },
-      {
-        name: 'Express',
-        icon: <SiExpress />,
-        color: '#ffffff',
-      },
-      {
-        name: 'GraphQL',
-        icon: <SiGraphql />,
-        color: '#E10098',
-      },
-      {
-        name: 'Apollo Client',
-        icon: <SiApollographql />,
-        color: '#311C87',
-      },
-    ],
-  },
+const fallbackVisual = { icon: <Code2 />, color: '#94A3B8' };
+const fallbackCategory = { categoryIcon: <Code2 className="w-6 h-6" />, categoryIconColor: '#94A3B8' };
 
-  {
-    title: 'Databases & ORM',
-    description: 'Database technologies and data management tools.',
-    categoryIcon: <Database className="w-6 h-6" />,
-    categoryIconColor: '#8B5CF6',
-    technologies: [
-      {
-        name: 'PostgreSQL',
-        icon: <SiPostgresql />,
-        color: '#336791',
-      },
-      {
-        name: 'MongoDB',
-        icon: <SiMongodb />,
-        color: '#47A248',
-      },
-      {
-        name: 'Redis',
-        icon: <SiRedis />,
-        color: '#DC382D',
-      },
-      {
-        name: 'Sequelize',
-        icon: <SiSequelize />,
-        color: '#52B0E7',
-      },
-    ],
-  },
-
-  {
-    title: 'Authentication & Security',
-    description: 'Authentication systems and application security practices.',
-    categoryIcon: <ShieldCheck className="w-6 h-6" />,
-    categoryIconColor: '#EF4444',
-    technologies: [
-      {
-        name: 'bcryptjs',
-        icon: <FaUserLock />,
-        color: '#F59E0B',
-      },
-      {
-        name: 'Express Session',
-        icon: <MdOutlineAccountBox />,
-        color: '#10B981',
-      },
-      {
-        name: 'JsonWebToken',
-        icon: <IoIosLock />,
-        color: '#F59E0B',
-      },
-    ],
-  },
-
-  {
-    title: 'Mobile Development',
-    description: 'Cross-platform mobile development and deployment tools.',
-    categoryIcon: <Smartphone className="w-6 h-6" />,
-    categoryIconColor: '#06B6D4',
-    technologies: [
-      {
-        name: 'React Native',
-        icon: <FaMobileAlt />,
-        color: '#61DAFB',
-      },
-      {
-        name: 'Expo',
-        icon: <SiExpo />,
-        color: '#ffffff',
-      },
-      {
-        name: 'React Navigation',
-        icon: <LiaReact />,
-        color: '#61DAFB',
-      },
-      {
-        name: 'Expo Secure Store',
-        icon: <IoIosLock />,
-        color: '#A855F7',
-      },
-      {
-        name: 'EAS Build',
-        icon: <FaBoxes />,
-        color: '#F97316',
-      },
-    ],
-  },
-
-  {
-    title: 'Engineering & Sustainability',
-    description: '8+ years of engineering, HSE, and procurement experience across oil & gas and industrial sectors.',
-    categoryIcon: <Leaf className="w-6 h-6" />,
-    categoryIconColor: '#10B981',
-    technologies: [
-      {
-        name: 'ISO 14001 EMS',
-        icon: <Award className="w-4 h-4" />,
-        color: '#10B981',
-      },
-      {
-        name: 'CEMS Monitoring',
-        icon: <Activity className="w-4 h-4" />,
-        color: '#22C55E',
-      },
-      {
-        name: 'Environmental Risk Assessment',
-        icon: <AlertTriangle className="w-4 h-4" />,
-        color: '#F59E0B',
-      },
-      {
-        name: 'ESG Compliance & Reporting',
-        icon: <ClipboardCheck className="w-4 h-4" />,
-        color: '#16A34A',
-      },
-      {
-        name: 'HSE Inspection & Auditing',
-        icon: <ShieldCheck className="w-4 h-4" />,
-        color: '#EF4444',
-      },
-      {
-        name: 'Procurement & Vendor Management',
-        icon: <Handshake className="w-4 h-4" />,
-        color: '#F97316',
-      },
-      {
-        name: 'MRP & Inventory Optimization',
-        icon: <Warehouse className="w-4 h-4" />,
-        color: '#8B5CF6',
-      },
-      {
-        name: 'Supplier Negotiation & Contracts',
-        icon: <FileSignature className="w-4 h-4" />,
-        color: '#0EA5E9',
-      },
-      {
-        name: 'Purchasing & Cost Analysis',
-        icon: <Calculator className="w-4 h-4" />,
-        color: '#F59E0B',
-      },
-      {
-        name: 'SAP',
-        icon: <SiSap />,
-        color: '#0FAAFF',
-      },
-    ],
-  },
-
-  {
-    title: 'AI & LLM Integration',
-    featured: true,
-    description: 'Tools and workflows used to build AI-powered applications and intelligent systems.',
-    categoryIcon: <Brain className="w-6 h-6" />,
-    categoryIconColor: '#A855F7',
-    technologies: [
-      {
-        name: 'Gemini API',
-        icon: <SiGooglegemini />,
-        color: '#8E75FF',
-      },
-      {
-        name: 'OpenAI API',
-        icon: <SiOpenai />,
-        color: '#10A37F',
-      },
-      {
-        name: 'Vercel AI SDK',
-        icon: <SiVercel />,
-        color: '#ffffff',
-      },
-      {
-        name: 'LangChain',
-        icon: <SiLangchain />,
-        color: '#1C64F2',
-      },
-      {
-        name: 'Prompt Engineering',
-        icon: <Sparkles className="w-4 h-4" />,
-        color: '#F59E0B',
-      },
-      {
-        name: 'RAG Systems',
-        icon: <BrainCircuit className="w-4 h-4" />,
-        color: '#8B5CF6',
-      },
-      {
-        name: 'AI Chat Interfaces',
-        icon: <Bot className="w-4 h-4" />,
-        color: '#06B6D4',
-      },
-      {
-        name: 'Semantic Search',
-        icon: <DatabaseZap className="w-4 h-4" />,
-        color: '#EC4899',
-      },
-      {
-        name: 'Context Management',
-        icon: <Layers3 className="w-4 h-4" />,
-        color: '#22C55E',
-      },
-    ],
-  },
-];
+// Names, grouping and descriptions come from lib/profile-data.ts (shared with the AI chat assistant).
+// Only the icons and colours live here; a technology without an entry above still shows up with a neutral icon.
+const categories: Category[] = TECH_STACK.map((group) => ({
+  title: group.category,
+  description: group.description,
+  featured: group.featured,
+  ...(categoryVisuals[group.category] ?? fallbackCategory),
+  technologies: group.items.map((name) => ({ name, ...(techVisuals[name] ?? fallbackVisual) })),
+}));
 
 export function TechStackSection() {
   const ref = useRef<HTMLDivElement | null>(null);

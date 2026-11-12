@@ -4,33 +4,13 @@ import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Mail, Linkedin, Github, ArrowUpRight, Instagram, Download } from 'lucide-react';
 import { useAnimationConfig } from '@/hooks/use-animation-config';
+import { CONTACT_LINKS } from '@/lib/profile-data';
 
-const links = [
-  {
-    label: 'Email',
-    href: 'mailto:indrasanjaya.ind@gmail.com',
-    icon: Mail,
-    value: 'indrasanjaya.ind@gmail.com',
-  },
-  {
-    label: 'LinkedIn',
-    href: 'https://www.linkedin.com/in/indra-sanjaya-dev',
-    icon: Linkedin,
-    value: 'Connect',
-  },
-  {
-    label: 'Instagram',
-    href: 'https://www.instagram.com/indra_isanjaya',
-    icon: Instagram,
-    value: 'Follow',
-  },
-  {
-    label: 'GitHub',
-    href: 'https://github.com/indra-sanjaya',
-    icon: Github,
-    value: 'Follow',
-  },
-];
+const linkIcons = { Email: Mail, LinkedIn: Linkedin, Instagram, GitHub: Github } as const;
+const links = CONTACT_LINKS.map((link) => ({
+  ...link,
+  icon: linkIcons[link.label as keyof typeof linkIcons],
+}));
 
 export function ContactSection() {
   const ref = useRef(null);

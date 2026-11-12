@@ -5,6 +5,7 @@ import { useRef } from 'react';
 import { Leaf, ShieldCheck, Award, Layers, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useAnimationConfig } from '@/hooks/use-animation-config';
 import { AnimatedMetricCard } from './animated-metric-card';
+import { IMPACT_METRICS } from '@/lib/profile-data';
 
 const glowStyles = [
   'hover:shadow-[0_20px_60px_-15px_rgba(34,197,94,0.35)]', // green
@@ -25,6 +26,18 @@ const borderColors = [
 ];
 
 const iconColors = ['#4ade80', '#60a5fa', '#fbbf24', '#818cf8', '#c084fc', '#34d399'];
+
+// Label, description and numbers come from lib/profile-data.ts (also read by the AI chat assistant)
+const metric = (id: (typeof IMPACT_METRICS)[number]['id']) => {
+  const { label, description, targetValue, ...rest } = IMPACT_METRICS.find((m) => m.id === id)!;
+  return {
+    label,
+    description,
+    targetValue,
+    ...('suffix' in rest ? { suffix: rest.suffix } : {}),
+    ...('unit' in rest ? { unit: rest.unit } : {}),
+  };
+};
 
 // PROPER ranking ladder, worst → best, matches Indonesia's real PROPER scale
 const properColorStops = [
@@ -90,11 +103,7 @@ export function ImpactSection() {
           <motion.div variants={itemVariants} custom={1}>
             <AnimatedMetricCard
               icon={Leaf}
-              label="Emissions Reduction Impact"
-              description="Contributed to large-scale sustainability initiatives in industrial operations, focusing on measurable carbon footprint reduction."
-              targetValue={700000}
-              suffix="+"
-              unit="tons CO2e"
+              {...metric('emissions')}
               fillPercent={88}
               iconColor={iconColors[0]}
               ringColor={iconColors[0]}
@@ -106,10 +115,7 @@ export function ImpactSection() {
           <motion.div variants={itemVariants} custom={2}>
             <AnimatedMetricCard
               icon={ShieldCheck}
-              label="Safety Performance Record"
-              description="Maintained zero lost-time incidents across high-risk LNG construction environments with strict safety compliance execution."
-              targetValue={0}
-              unit="LTI"
+              {...metric('safety')}
               fillPercent={100}
               iconColor={iconColors[1]}
               ringColor={iconColors[1]}
@@ -121,9 +127,7 @@ export function ImpactSection() {
           <motion.div variants={itemVariants} custom={3}>
             <AnimatedMetricCard
               icon={Award}
-              label="PROPER"
-              description="Achieved top-tier PROPER certification recognition for environmental management and regulatory compliance performance."
-              targetValue={0}
+              {...metric('proper')}
               fillPercent={100}
               showNumericValue={false}
               iconColor={iconColors[2]}
@@ -136,10 +140,7 @@ export function ImpactSection() {
           <motion.div variants={itemVariants} custom={4}>
             <AnimatedMetricCard
               icon={Layers}
-              label="Production Systems"
-              description="End-to-end applications with auth, databases, APIs, and deployment"
-              targetValue={4}
-              unit="Full-stack Apps"
+              {...metric('systems')}
               fillPercent={80}
               iconColor={iconColors[3]}
               ringColor={iconColors[3]}
@@ -151,10 +152,7 @@ export function ImpactSection() {
           <motion.div variants={itemVariants} custom={5}>
             <AnimatedMetricCard
               icon={Sparkles}
-              label="Gemini-powered Features"
-              description="AI storyboards, itinerary generation, and content automation pipelines"
-              targetValue={3}
-              unit="AI Integrations"
+              {...metric('ai')}
               fillPercent={75}
               iconColor={iconColors[4]}
               ringColor={iconColors[4]}
@@ -166,11 +164,7 @@ export function ImpactSection() {
           <motion.div variants={itemVariants} custom={6}>
             <AnimatedMetricCard
               icon={CheckCircle2}
-              label="Backend Reliability"
-              description="Jest + Supertest coverage across controllers and API layers"
-              targetValue={90}
-              suffix="%"
-              unit="Test Coverage"
+              {...metric('tests')}
               fillPercent={90}
               iconColor={iconColors[5]}
               ringColor={iconColors[5]}
