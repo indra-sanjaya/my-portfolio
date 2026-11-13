@@ -80,9 +80,7 @@ export function ContactSection() {
                   style={{ objectPosition: '50% 25%' }}
                 />
                 <span className="absolute bottom-0.5 right-0.5 flex h-5 w-5 items-center justify-center" title="Open to opportunities">
-                  {!prefersReduced && (
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
-                  )}
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50 motion-reduce:hidden" />
                   <span className="relative block h-5 w-5 rounded-full bg-emerald-500 ring-2 ring-card" />
                 </span>
               </div>
@@ -177,15 +175,13 @@ export function ContactSection() {
               animate={isInView ? 'visible' : 'hidden'}
               className="group relative flex items-center justify-between gap-4 overflow-hidden p-4 sm:p-5 bg-foreground text-background rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:opacity-90 hover:shadow-2xl">
               {/* one soft shine after it appears */}
-              {!prefersReduced && (
-                <motion.span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-background/25 to-transparent"
-                  initial={{ x: '0%', opacity: 0 }}
-                  animate={isInView ? { x: '480%', opacity: [0, 1, 1, 0] } : {}}
-                  transition={{ duration: 1.4, delay: 0.5, ease: 'easeInOut' }}
-                />
-              )}
+              <motion.span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-background/25 to-transparent motion-reduce:hidden"
+                initial={{ x: '0%', opacity: 0 }}
+                animate={isInView ? { x: '480%', opacity: [0, 1, 1, 0] } : {}}
+                transition={{ duration: 1.4, delay: 0.5, ease: 'easeInOut' }}
+              />
               <div className="flex items-center gap-4 min-w-0">
                 <div className="p-2.5 bg-background/15 rounded-xl transition-colors duration-300">
                   <Download className="w-5 h-5 text-background" />

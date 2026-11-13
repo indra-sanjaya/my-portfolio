@@ -133,10 +133,10 @@ export function CertificationsSection() {
                   />
                 </span>
                 {/* featured: one soft shine after it appears */}
-                {cert.featured && !prefersReduced && (
+                {cert.featured && (
                   <motion.span
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/4 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/4 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent motion-reduce:hidden"
                     variants={{
                       hidden: { x: '0%', opacity: 0 },
                       visible: { x: '520%', opacity: [0, 1, 1, 0], transition: { duration: 1.6, delay: 0.8, ease: 'easeInOut' } },
