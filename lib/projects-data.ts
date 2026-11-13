@@ -234,7 +234,11 @@ export const projectsData: ProjectData[] = [
       'Gemini call wrapped in a helper that falls back gracefully — if the API key is absent or the call fails, the trip is still created with a null itinerary rather than blocking the flow',
       'Both client and server are deployed as separate Vercel projects; GitHub OAuth redirect URI is configured to point at the server URL, with the token passed back to the client via query param redirect',
     ],
-    cover: { variant: 'browser', src: '/tripplanner/my_trips.png', alt: 'TripPlanner My Trips page with trip cards' },
+    cover: {
+      variant: 'browser',
+      src: '/tripplanner/itinerary_detail.png',
+      alt: 'TripPlanner trip detail page with a vacation-themed header and itinerary summary',
+    },
     screenshots: [
       {
         src: '/tripplanner/landing_page.png',
@@ -248,7 +252,7 @@ export const projectsData: ProjectData[] = [
       },
       {
         src: '/tripplanner/create_trip.png',
-        alt: 'Create trip with hotel selection',
+        alt: 'Create trip form with dates, guests, budget and interests',
         label: 'Create Trip',
       },
       {
