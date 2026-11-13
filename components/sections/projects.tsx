@@ -116,7 +116,8 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
       animate={isInView ? 'visible' : 'hidden'}
       variants={cardVariants}
       transition={{ delay: index * 0.12 }}
-      className="group"
+      id={`project-${project.id}`}
+      className="group scroll-mt-28"
     >
       <div
         className="
