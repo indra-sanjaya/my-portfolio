@@ -160,10 +160,10 @@ export function PhilosophySection() {
                 hidden: { opacity: 0, y: 36 },
                 visible: { opacity: 1, y: 0, transition: { duration: durationFast, delay: index === 0 ? 0.15 : 0, ease } },
               }}
-              className="group relative overflow-hidden rounded-3xl border border-border bg-background/60 p-6 pl-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-8 sm:pl-10"
+              className="group relative overflow-hidden rounded-3xl border border-border bg-background/60 p-6 pl-7 pt-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-8 sm:pl-10 sm:pt-9"
               style={{ ['--accent' as string]: principle.accent }}
             >
-              {/* accent bar that grows in */}
+              {/* accent bar that grows down the left edge */}
               <motion.span
                 aria-hidden="true"
                 className="absolute inset-y-0 left-0 w-1.5 origin-top"
@@ -173,6 +173,27 @@ export function PhilosophySection() {
                   visible: { scaleY: 1, transition: { duration: prefersReduced ? 0 : 0.8, delay: 0.25, ease } },
                 }}
               />
+              {/* accent line that fills left to right, like the Impact rings */}
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-0 top-0 h-1"
+                style={{ backgroundColor: `${principle.accent}22` }}
+              >
+                <motion.span
+                  className="block h-full origin-left rounded-r-full"
+                  style={{
+                    backgroundImage: `linear-gradient(to right, ${principle.accent}99, ${principle.accent})`,
+                    boxShadow: `0 0 14px ${principle.accent}99`,
+                  }}
+                  variants={{
+                    hidden: { scaleX: 0 },
+                    visible: {
+                      scaleX: 1,
+                      transition: { duration: prefersReduced ? 0 : 1.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] },
+                    },
+                  }}
+                />
+              </span>
               {/* tint on hover */}
               <span
                 aria-hidden="true"
