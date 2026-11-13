@@ -64,7 +64,7 @@ function ProjectPreview({ cover, title, liveUrl }: { cover: ProjectCover; title:
           <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
           <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
-          <span className="ml-3 truncate rounded-md bg-background/80 px-3 py-0.5 text-[11px] text-muted-foreground">
+          <span className="ml-3 min-w-0 truncate rounded-md bg-background/80 px-3 py-0.5 text-[11px] text-muted-foreground">
             {hostOf(liveUrl) || title}
           </span>
         </div>
@@ -132,7 +132,7 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
         "
       >
         <div
-          className={`grid gap-8 lg:gap-12 lg:items-center ${
+          className={`grid grid-cols-[minmax(0,1fr)] gap-8 lg:gap-12 lg:items-center ${
             project.cover ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]' : ''
           }`}
         >

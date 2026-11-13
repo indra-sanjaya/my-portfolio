@@ -212,17 +212,17 @@ export function TechStackSection() {
                     onClick={() => handleExpand(category.title)}
                     className="
                       group relative w-full text-left
-                      p-7 md:p-8
+                      p-5 sm:p-7 md:p-8
                     ">
-                    <div className="flex items-start justify-between gap-6">
+                    <div className="flex items-start justify-between gap-3 sm:gap-6">
                       {/* LEFT */}
-                      <div className="flex items-start gap-5 flex-1 min-w-0">
+                      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-4 sm:gap-x-5 flex-1 min-w-0">
                         {/* CATEGORY ICON */}
                         <div
                           className="
                             shrink-0
                             flex items-center justify-center
-                            w-14 h-14 rounded-2xl border
+                            w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border
                             border-border bg-background/50 text-muted-foreground"
                           style={{
                             borderColor: category.categoryIconColor + '25',
@@ -232,9 +232,9 @@ export function TechStackSection() {
                           {category.categoryIcon}
                         </div>
 
-                        {/* TEXT */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-3 mb-3">
+                        {/* TITLE */}
+                        <div className="min-w-0 self-center sm:self-start">
+                          <div className="flex flex-wrap items-center gap-3 sm:mb-3">
                             <h3 className="text-2xl font-semibold text-foreground">{category.title}</h3>
 
                             {category.featured && (
@@ -244,17 +244,20 @@ export function TechStackSection() {
                               </div>
                             )}
                           </div>
+                        </div>
 
+                        {/* DESCRIPTION: full width on mobile, aligned under the title from sm up */}
+                        <div className="col-span-2 min-w-0 sm:col-span-1 sm:col-start-2 sm:-mt-4">
                           <p className="text-muted-foreground leading-7 max-w-3xl">{category.description}</p>
 
-                          <div className="flex items-center gap-3 mt-5 text-sm text-muted-foreground">
-                            <span>{category.technologies.length} Technologies</span>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-5 text-sm text-muted-foreground">
+                            <span className="whitespace-nowrap">{category.technologies.length} Technologies</span>
 
                             {!isExpanded && (
                               <>
                                 <span className="opacity-30">•</span>
 
-                                <span>Click to expand</span>
+                                <span className="whitespace-nowrap">Click to expand</span>
                               </>
                             )}
                           </div>
@@ -266,7 +269,7 @@ export function TechStackSection() {
                         className={`
                           shrink-0
                           flex items-center justify-center
-                          w-12 h-12 rounded-2xl
+                          w-10 h-10 sm:w-12 sm:h-12 rounded-2xl
                           border border-border
                           bg-background/60
                           transition-all duration-300
