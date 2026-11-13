@@ -19,6 +19,17 @@ const primaryButton = `${baseButton} bg-foreground text-background hover:scale-1
 
 const outlineButton = `${baseButton} border border-border text-foreground hover:scale-110 hover:shadow-md transition-all duration-200 px-9 py-2`;
 
+const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
+/** One accent per project, dark enough to read as small text on both themes. */
+const PROJECT_ACCENT: Record<string, string> = {
+  'firework-studio': '#EA580C',
+  sprintzee: '#059669',
+  tripplanner: '#0284C7',
+  voca: '#7C3AED',
+};
+const DEFAULT_ACCENT = '#0284C7';
+
 function hostOf(url?: string) {
   try {
     return url ? new URL(url).hostname.replace(/^www\./, '') : '';
@@ -93,7 +104,9 @@ function ProjectPreview({ cover, title, liveUrl }: { cover: ProjectCover; title:
 function ProjectCard({ project, index }: { project: ProjectData; index: number }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.25 });
-  const { duration } = useAnimationConfig();
+  const { duration, prefersReduced } = useAnimationConfig();
+  const k = prefersReduced ? 0 : 1;
+  const accent = PROJECT_ACCENT[project.id] ?? DEFAULT_ACCENT;
 
   const cardVariants = {
     hidden: { opacity: 0, y: 50 },
@@ -108,6 +121,10 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
   };
 
   const highlights = project.features.slice(0, 3);
+  const itemVariants = {
+    hidden: { opacity: 0, y: 18 },
+    visible: { opacity: 1, y: 0, transition: { duration: k * 0.6, ease: EASE } },
+  };
 
   return (
     <motion.article
@@ -115,13 +132,14 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
       variants={cardVariants}
-      transition={{ delay: index * 0.12 }}
       id={`project-${project.id}`}
       className="group scroll-mt-28"
+      style={{ ['--accent' as string]: accent }}
     >
       <div
         className="
           relative
+          overflow-hidden
           rounded-3xl
           border border-border
           bg-card
@@ -131,40 +149,88 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
           hover:bg-secondary/20
         "
       >
+        {/* accent line that fills left to right */}
+        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: `${accent}22` }}>
+          <motion.span
+            className="block h-full origin-left rounded-r-full"
+            style={{
+              backgroundImage: `linear-gradient(to right, ${accent}99, ${accent})`,
+              boxShadow: `0 0 14px ${accent}88`,
+            }}
+            variants={{
+              hidden: { scaleX: 0 },
+              visible: { scaleX: 1, transition: { duration: k * 1.8, delay: k * 0.2, ease: EASE } },
+            }}
+          />
+        </span>
+        {/* soft tint on hover */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{ backgroundImage: `radial-gradient(90% 70% at 0% 0%, ${accent}12, transparent 60%)` }}
+        />
+
         <div
-          className={`grid grid-cols-[minmax(0,1fr)] gap-8 lg:gap-12 lg:items-center ${
+          className={`relative grid grid-cols-[minmax(0,1fr)] gap-8 lg:gap-12 lg:items-center ${
             project.cover ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]' : ''
           }`}
         >
           {project.cover && (
-            <div className={index % 2 === 0 ? 'lg:order-2' : ''}>
+            <motion.div
+              className={`relative ${index % 2 === 0 ? 'lg:order-2' : ''}`}
+              variants={{
+                hidden: { y: 28, scale: 1.03 },
+                visible: { y: 0, scale: 1, transition: { duration: k * 1.1, delay: k * 0.15, ease: EASE } },
+              }}
+            >
               <ProjectPreview cover={project.cover} title={project.title} liveUrl={project.liveUrl} />
-            </div>
+              {/* curtain that wipes away left to right, with an accent leading edge */}
+              <motion.span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 origin-right rounded-2xl bg-card"
+                style={{ borderLeft: `3px solid ${accent}` }}
+                variants={{
+                  hidden: { scaleX: 1 },
+                  visible: { scaleX: 0, transition: { duration: k * 1.1, delay: k * 0.15, ease: EASE } },
+                }}
+              />
+            </motion.div>
           )}
 
           {/* CONTENT */}
-          <div className="space-y-6">
-            <div>
-              {project.subtitle && (
-                <span className="text-xs tracking-widest uppercase text-muted-foreground">{project.subtitle}</span>
-              )}
+          <motion.div
+            className="space-y-6"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: k * 0.09, delayChildren: k * 0.3 } } }}
+          >
+            <motion.div variants={itemVariants}>
+              <span className="flex items-center gap-3 text-xs tracking-widest uppercase text-muted-foreground">
+                <span className="font-mono font-semibold" style={{ color: accent }}>
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                {project.subtitle && <span>{project.subtitle}</span>}
+              </span>
 
               <h3 className="mt-2 text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
                 {project.title}
               </h3>
-            </div>
-            <p className="text-muted-foreground leading-relaxed max-w-xl">{project.shortDescription}</p>
+            </motion.div>
+            <motion.p variants={itemVariants} className="text-muted-foreground leading-relaxed max-w-xl">
+              {project.shortDescription}
+            </motion.p>
             {/* FEATURES */}
-            <ul className="space-y-2">
+            <motion.ul variants={itemVariants} className="space-y-2">
               {highlights.map((item) => (
                 <li key={item} className="flex gap-3 text-sm text-muted-foreground">
-                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary/60 flex-shrink-0" />
+                  <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accent }} />
                   {item}
                 </li>
               ))}
-            </ul>
+            </motion.ul>
             {/* TECH */}
-            <div className="flex flex-wrap gap-2 pt-2">
+            <motion.div
+              className="flex flex-wrap gap-2 pt-2"
+              variants={{ hidden: {}, visible: { transition: { staggerChildren: k * 0.05 } } }}
+            >
               {project.techStack.slice(0, 6).map((tech, index) => {
                 const colors = [
                   'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20',
@@ -178,8 +244,12 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
                 const colorClass = colors[index % colors.length];
 
                 return (
-                  <span
+                  <motion.span
                     key={tech}
+                    variants={{
+                      hidden: { opacity: 0, scale: 0.85 },
+                      visible: { opacity: 1, scale: 1, transition: { duration: k * 0.4, ease: EASE } },
+                    }}
                     className={`
           px-3 py-1 text-xs
           rounded-full
@@ -191,12 +261,12 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
         `}
                   >
                     {tech}
-                  </span>
+                  </motion.span>
                 );
               })}
-            </div>{' '}
+            </motion.div>{' '}
             {/* ACTIONS */}
-            <div className="flex flex-wrap gap-3 pt-2">
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-3 pt-2">
               {/* DETAILS (FIXED MODAL TRIGGER) */}
               <ProjectDetailModal project={project} />
 
@@ -215,8 +285,8 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
                   Code
                 </a>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </motion.article>
