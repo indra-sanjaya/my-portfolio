@@ -35,6 +35,65 @@ const highlights = [
   },
 ];
 
+const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
+const JOURNEY_COLORS = ['#0EA5E9', '#10B981', '#8B5CF6', 'var(--hazard)'];
+
+/** Timeline that draws itself in chronological order once it is on screen. */
+function JourneyTimeline() {
+  const ref = useRef<HTMLOListElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.6 });
+  const { prefersReduced } = useAnimationConfig();
+  const k = prefersReduced ? 0 : 1;
+  const STEP = 0.75; // seconds between milestones
+
+  return (
+    <ol ref={ref} className="grid grid-cols-2 gap-x-5 gap-y-7 md:grid-cols-4">
+      {journey.map((step, index) => {
+        const color = JOURNEY_COLORS[index % JOURNEY_COLORS.length];
+        const isNow = index === journey.length - 1;
+        const delay = k * index * STEP;
+        return (
+          <li key={step.year} className="relative pt-5">
+            {/* track + line that fills left to right */}
+            <span aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5 bg-border" />
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-x-0 top-0 h-0.5 origin-left"
+              style={{ backgroundColor: color, boxShadow: `0 0 10px color-mix(in oklab, ${color} 60%, transparent)` }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: isInView ? 1 : 0 }}
+              transition={{ duration: k * 1.1, delay, ease: EASE }}
+            />
+            {/* dot that pops as the line starts */}
+            <motion.span
+              aria-hidden="true"
+              className="absolute -top-[5px] left-0 size-3 rounded-full"
+              style={{
+                backgroundColor: color,
+                boxShadow: `0 0 0 4px color-mix(in oklab, ${color} ${isNow ? 28 : 18}%, transparent)`,
+              }}
+              initial={{ scale: 0 }}
+              animate={{ scale: isInView ? 1 : 0 }}
+              transition={{ duration: k * 0.45, delay, ease: [0.34, 1.56, 0.64, 1] }}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: isInView ? 1 : 0, y: isInView ? 0 : 14 }}
+              transition={{ duration: k * 0.6, delay: delay + k * 0.25, ease: EASE }}
+            >
+              <span className="font-mono text-xs font-semibold" style={{ color }}>
+                {step.year}
+              </span>
+              <h3 className="mt-1.5 text-sm font-semibold text-foreground">{step.title}</h3>
+              <p className="mt-1.5 text-[0.8rem] leading-5 text-foreground/70">{step.description}</p>
+            </motion.div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 export function AboutSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
@@ -137,31 +196,7 @@ export function AboutSection() {
 
               <div className="mt-auto pt-10">
                 <p className="mb-5 font-mono text-xs tracking-[0.2em] text-hazard uppercase">The Journey</p>
-                <ol className="grid grid-cols-2 gap-x-5 gap-y-7 md:grid-cols-4">
-                  {journey.map((step, index) => {
-                    const isNow = index === journey.length - 1;
-                    return (
-                      <motion.li
-                        key={step.year}
-                        variants={itemVariants}
-                        custom={3 + index * 0.6}
-                        initial="hidden"
-                        animate={animate}
-                        className="relative border-t border-border pt-5">
-                        <span
-                          className={`absolute -top-[5px] left-0 size-2.5 rounded-full ${
-                            isNow ? 'bg-hazard shadow-[0_0_0_4px_color-mix(in_oklab,var(--hazard)_25%,transparent)]' : 'bg-muted-foreground/60'
-                          }`}
-                        />
-                        <span className={`font-mono text-xs ${isNow ? 'text-hazard' : 'text-muted-foreground'}`}>
-                          {step.year}
-                        </span>
-                        <h3 className="mt-1.5 text-sm font-semibold text-foreground">{step.title}</h3>
-                        <p className="mt-1.5 text-[0.8rem] leading-5 text-foreground/70">{step.description}</p>
-                      </motion.li>
-                    );
-                  })}
-                </ol>
+                <JourneyTimeline />
               </div>
 
               <div className="mt-8 flex items-center gap-2 text-sm text-primary font-medium">
@@ -178,11 +213,23 @@ export function AboutSection() {
             <motion.div
               key={item.title}
               variants={itemVariants}
-              custom={4 + index}
+              custom={index * 0.8}
               initial="hidden"
-              animate={animate}
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
               whileHover={{ y: -4, transition: { duration: durationFast * 0.5 } }}
               className={`group relative overflow-hidden rounded-2xl border border-border bg-card/60 p-6 sm:p-7 transition-[border-color,box-shadow] duration-500 ${item.hover}`}>
+              {/* accent line that fills left to right */}
+              <span aria-hidden="true" className="absolute inset-x-0 top-0 h-0.5" style={{ backgroundColor: `${item.color}26` }}>
+                <motion.span
+                  className="block h-full origin-left"
+                  style={{ backgroundColor: item.color, boxShadow: `0 0 12px ${item.color}99` }}
+                  variants={{
+                    hidden: { scaleX: 0 },
+                    visible: { scaleX: 1, transition: { duration: durationFast * 3.5, delay: 0.2, ease: EASE } },
+                  }}
+                />
+              </span>
               <div
                 className="mb-5 flex size-11 items-center justify-center rounded-xl"
                 style={{ color: item.color, backgroundColor: `${item.color}1a` }}>
