@@ -14,11 +14,14 @@ import { localizeArticles } from '@/components/articles/localize';
 import { TagChip } from '@/components/articles/tag-chip';
 
 const MAX_ARTICLES = 4;
+const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
+const ACCENTS = ['#F97316', '#0EA5E9', '#10B981', '#8B5CF6'];
 
 export function ArticlesSection({ articles }: { articles: LocalizedArticle[] }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
-  const { duration, durationFast } = useAnimationConfig();
+  const { duration, durationFast, prefersReduced } = useAnimationConfig();
+  const k = prefersReduced ? 0 : 1;
   const [lang, setLang] = useArticleLang();
   const t = UI[lang];
 
@@ -43,22 +46,51 @@ export function ArticlesSection({ articles }: { articles: LocalizedArticle[] }) 
           <div>
             <span className="section-eyebrow">{t.homeEyebrow}</span>
             <h2 className="section-title mt-4">{t.homeTitle}</h2>
+            <motion.div
+              className="mt-4 flex h-1 w-32 origin-left overflow-hidden rounded-full"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: isInView ? 1 : 0 }}
+              transition={{ duration: k * 1, delay: k * 0.3, ease: EASE }}
+              aria-hidden="true"
+            >
+              {ACCENTS.map((color) => (
+                <span key={color} className="h-full flex-1" style={{ backgroundColor: color }} />
+              ))}
+            </motion.div>
             <p className="mt-4 text-muted-foreground max-w-2xl leading-relaxed">{t.homeSubtitle}</p>
           </div>
           <ListLanguageSwitch current={lang} onChange={setLang} />
         </motion.div>
 
         <ul className="grid gap-5 md:grid-cols-2">
-          {listed.map((article, index) => (
+          {listed.map((article, index) => {
+            const accent = ACCENTS[index % ACCENTS.length];
+            return (
             <motion.li
               key={article.slug}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: durationFast, delay: 0.08 * index, ease: 'easeOut' as const }}>
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.25 }}
+              variants={{
+                hidden: { opacity: 0, y: 34 },
+                visible: { opacity: 1, y: 0, transition: { duration: durationFast, delay: (index % 2) * 0.12, ease: EASE } },
+              }}
+              style={{ ['--accent' as string]: accent }}>
               <Link
                 href={article.href ?? `/articles/${article.slug}`}
                 onClick={() => saveArticleLang(lang)}
-                className="blueprint-grid group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card/60 p-6 transition-colors hover:border-hazard/50 sm:p-8">
+                className="blueprint-grid group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card/60 p-6 transition-colors hover:border-[var(--accent)]/50 sm:p-8">
+                {/* accent line that fills left to right */}
+                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: `${accent}26` }}>
+                  <motion.span
+                    className="block h-full origin-left"
+                    style={{ backgroundColor: accent, boxShadow: `0 0 12px ${accent}99` }}
+                    variants={{
+                      hidden: { scaleX: 0 },
+                      visible: { scaleX: 1, transition: { duration: k * 1.4, delay: k * 0.25, ease: EASE } },
+                    }}
+                  />
+                </span>
                 <div className="flex items-center justify-between gap-3 font-mono text-xs text-muted-foreground">
                   <span>
                     {new Date(article.publishedAt).toLocaleDateString(LANG_LOCALE[lang], {
@@ -75,7 +107,7 @@ export function ArticlesSection({ articles }: { articles: LocalizedArticle[] }) 
                     </span>
                   )}
                 </div>
-                <h3 className="mt-4 text-balance text-xl font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-hazard sm:text-2xl">
+                <h3 className="mt-4 text-balance text-xl font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-[var(--accent)] sm:text-2xl">
                   {article.title}
                 </h3>
                 <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{article.description}</p>
@@ -85,11 +117,12 @@ export function ArticlesSection({ articles }: { articles: LocalizedArticle[] }) 
                       <TagChip key={tag} label={tag} />
                     ))}
                   </div>
-                  <ArrowUpRight className="size-5 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-hazard" />
+                  <ArrowUpRight className="size-5 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--accent)]" />
                 </div>
               </Link>
             </motion.li>
-          ))}
+            );
+          })}
         </ul>
 
         <div className="mt-10 flex justify-center">

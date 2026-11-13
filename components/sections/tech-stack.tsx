@@ -61,6 +61,8 @@ import {
   Calculator,
 } from 'lucide-react';
 
+const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
 type Tech = {
   name: string;
   icon: React.ReactNode;
@@ -147,7 +149,7 @@ const categories: Category[] = TECH_STACK.map((group) => ({
 export function TechStackSection() {
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const { duration, durationFast } = useAnimationConfig();
+  const { duration, durationFast, prefersReduced } = useAnimationConfig();
 
   const isInView = useInView(ref, {
     once: true,
@@ -174,6 +176,16 @@ export function TechStackSection() {
           <h2 className="section-title mt-4">
             Skills, Tech Stack & AI Integration
           </h2>
+          <motion.div
+            className="mt-5 flex h-1 w-40 origin-left overflow-hidden rounded-full"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: isInView ? 1 : 0 }}
+            transition={{ duration: prefersReduced ? 0 : 1, delay: prefersReduced ? 0 : 0.3, ease: EASE }}
+            aria-hidden="true">
+            {['#F59E0B', '#38BDF8', '#22C55E', '#8B5CF6'].map((color) => (
+              <span key={color} className="h-full flex-1" style={{ backgroundColor: color }} />
+            ))}
+          </motion.div>
 
           <p className="mt-5 text-[clamp(1rem,2.2vw,1.125rem)] leading-7 text-muted-foreground max-w-3xl">
             Technologies and tools I use to build modern full-stack and AI-powered applications.
@@ -191,11 +203,12 @@ export function TechStackSection() {
               return (
                 <motion.div
                   key={category.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{
-                    duration: durationFast,
-                    delay: categoryIndex * 0.05,
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.3 }}
+                  variants={{
+                    hidden: { opacity: 0, y: 28 },
+                    visible: { opacity: 1, y: 0, transition: { duration: durationFast, ease: EASE } },
                   }}
                   className={`
                     relative overflow-hidden
@@ -204,6 +217,23 @@ export function TechStackSection() {
                     transition-all duration-500
                     border-border bg-card/60
                   `}>
+                  {/* accent line that fills left to right, in the category colour */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-x-0 top-0 z-10 h-1"
+                    style={{ backgroundColor: `${category.categoryIconColor}26` }}>
+                    <motion.span
+                      className="block h-full origin-left"
+                      style={{
+                        backgroundColor: category.categoryIconColor,
+                        boxShadow: `0 0 12px ${category.categoryIconColor}99`,
+                      }}
+                      variants={{
+                        hidden: { scaleX: 0 },
+                        visible: { scaleX: 1, transition: { duration: prefersReduced ? 0 : 1.4, delay: prefersReduced ? 0 : 0.25, ease: EASE } },
+                      }}
+                    />
+                  </span>
                   {/* Glow */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-transparent pointer-events-none" />
 
@@ -218,7 +248,8 @@ export function TechStackSection() {
                       {/* LEFT */}
                       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-4 sm:gap-x-5 flex-1 min-w-0">
                         {/* CATEGORY ICON */}
-                        <div
+                        <motion.div
+                          variants={{ hidden: { scale: 0.5, opacity: 0 }, visible: { scale: 1, opacity: 1, transition: { duration: prefersReduced ? 0 : 0.5, delay: prefersReduced ? 0 : 0.35, ease: [0.34, 1.56, 0.64, 1] } } }}
                           className="
                             shrink-0
                             flex items-center justify-center
@@ -230,7 +261,7 @@ export function TechStackSection() {
                             color: category.categoryIconColor,
                           }}>
                           {category.categoryIcon}
-                        </div>
+                        </motion.div>
 
                         {/* TITLE */}
                         <div className="min-w-0 self-center sm:self-start">

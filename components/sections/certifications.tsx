@@ -8,10 +8,15 @@ import { useAnimationConfig } from '@/hooks/use-animation-config';
 import { certifications } from '@/lib/profile-data';
 
 
+const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
+const FEATURED_ACCENT = '#F97316';
+const ACCENT_CYCLE = ['#0EA5E9', '#8B5CF6', '#10B981', '#F59E0B', '#EC4899'];
+
 export function CertificationsSection() {
   const ref = useRef(null);
 
-  const { duration, durationFast } = useAnimationConfig();
+  const { duration, durationFast, prefersReduced } = useAnimationConfig();
+  const k = prefersReduced ? 0 : 1;
 
   const isInView = useInView(ref, {
     once: true,
@@ -66,6 +71,18 @@ export function CertificationsSection() {
             </div>
           </div>
 
+          <motion.div
+            className="mb-5 flex h-1 w-40 origin-left overflow-hidden rounded-full"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: isInView ? 1 : 0 }}
+            transition={{ duration: k * 1, delay: k * 0.4, ease: EASE }}
+            aria-hidden="true"
+          >
+            {[FEATURED_ACCENT, ...ACCENT_CYCLE.slice(0, 3)].map((color) => (
+              <span key={color} className="h-full flex-1" style={{ backgroundColor: color }} />
+            ))}
+          </motion.div>
+
           <p className="text-muted-foreground max-w-2xl leading-8 text-base">
             Certifications and assessments validating my technical skills, problem-solving ability, and full-stack
             development experience.
@@ -75,31 +92,57 @@ export function CertificationsSection() {
         {/* Cards */}
         <motion.div className="grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
           <AnimatePresence>
-            {visibleCertifications.map((cert, index) => (
+            {visibleCertifications.map((cert, index) => {
+              const accent = cert.featured ? FEATURED_ACCENT : ACCENT_CYCLE[certifications.indexOf(cert) % ACCENT_CYCLE.length];
+              return (
               <motion.a
                 key={cert.title}
                 href={cert.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{
-                  duration: durationFast,
-                  delay: index * 0.05,
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                variants={{
+                  hidden: { opacity: 0, y: 28 },
+                  visible: { opacity: 1, y: 0, transition: { duration: durationFast, delay: (index % 3) * 0.1, ease: EASE } },
                 }}
+                exit={{ opacity: 0, y: 20 }}
+                style={{ ['--accent' as string]: accent }}
                 className={`
                   group relative overflow-hidden rounded-3xl border
                   transition-all duration-300
                   hover:-translate-y-1
-                  hover:border-blue-700
-                  hover:shadow-[0_15px_45px_-15px_rgba(56,189,248,0.25)]
+                  hover:border-[var(--accent)]/60
+                  hover:shadow-[0_15px_45px_-15px_var(--accent)]
                   ${
                     cert.featured ?
                       'bg-gradient-to-br from-primary/10 to-secondary border-primary/20 sm:col-span-2'
                     : 'bg-secondary/30 border-border'
                   }
                 `}>
+                {/* accent line that fills left to right */}
+                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1" style={{ backgroundColor: `${accent}26` }}>
+                  <motion.span
+                    className="block h-full origin-left"
+                    style={{ backgroundColor: accent, boxShadow: `0 0 12px ${accent}99` }}
+                    variants={{
+                      hidden: { scaleX: 0 },
+                      visible: { scaleX: 1, transition: { duration: k * 1.4, delay: k * 0.3, ease: EASE } },
+                    }}
+                  />
+                </span>
+                {/* featured: one soft shine after it appears */}
+                {cert.featured && !prefersReduced && (
+                  <motion.span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/4 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+                    variants={{
+                      hidden: { x: '0%', opacity: 0 },
+                      visible: { x: '520%', opacity: [0, 1, 1, 0], transition: { duration: 1.6, delay: 0.8, ease: 'easeInOut' } },
+                    }}
+                  />
+                )}
                 {/* Hover Glow */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/5 via-transparent to-transparent" />
 
@@ -137,7 +180,7 @@ export function CertificationsSection() {
                       </div>
 
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CalendarDays className="w-4 h-4" />
+                        <CalendarDays className="w-4 h-4" style={{ color: accent }} />
                         <span>Earned {cert.earnedOn}</span>
                       </div>
                     </div>
@@ -151,7 +194,8 @@ export function CertificationsSection() {
                   </div>
                 </div>
               </motion.a>
-            ))}
+              );
+            })}
           </AnimatePresence>
         </motion.div>
 
