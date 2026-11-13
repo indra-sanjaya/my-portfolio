@@ -2,10 +2,11 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import Image from 'next/image';
 import { ArrowUpRight, Github } from 'lucide-react';
 
 import { ProjectDetailModal } from '@/components/projects/project-detail-modal';
-import { projectsData, type ProjectData } from '@/lib/projects-data';
+import { projectsData, type ProjectCover, type ProjectData } from '@/lib/projects-data';
 import { useAnimationConfig } from '@/hooks/use-animation-config';
 
 /* -------------------------
@@ -17,6 +18,77 @@ const baseButton =
 const primaryButton = `${baseButton} bg-foreground text-background hover:scale-110 hover:shadow-md transition-all duration-200`;
 
 const outlineButton = `${baseButton} border border-border text-foreground hover:scale-110 hover:shadow-md transition-all duration-200 px-9 py-2`;
+
+function hostOf(url?: string) {
+  try {
+    return url ? new URL(url).hostname.replace(/^www\./, '') : '';
+  } catch {
+    return '';
+  }
+}
+
+/** One preview per project: a browser window for web apps, a pair of phones for mobile apps. */
+function ProjectPreview({ cover, title, liveUrl }: { cover: ProjectCover; title: string; liveUrl?: string }) {
+  const frame =
+    cover.variant === 'phone' ? (
+      <div className="relative flex h-[340px] sm:h-[400px] items-center justify-center overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-secondary/40 to-primary/5">
+        <div className="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-primary/15 blur-3xl" />
+        <div className="relative flex items-center">
+          <div className="-rotate-3 overflow-hidden rounded-[1.6rem] border-[5px] border-foreground/80 shadow-xl transition-transform duration-500 group-hover/preview:-rotate-6 group-hover/preview:-translate-x-1">
+            <Image
+              src={cover.src}
+              alt={cover.alt}
+              width={411}
+              height={838}
+              sizes="(max-width: 1024px) 40vw, 200px"
+              className="h-[290px] sm:h-[350px] w-auto"
+            />
+          </div>
+          {cover.secondarySrc && (
+            <div className="-ml-8 mt-8 rotate-3 overflow-hidden rounded-[1.6rem] border-[5px] border-foreground/80 shadow-xl transition-transform duration-500 group-hover/preview:rotate-6 group-hover/preview:translate-x-1">
+              <Image
+                src={cover.secondarySrc}
+                alt={cover.secondaryAlt ?? ''}
+                width={411}
+                height={839}
+                sizes="(max-width: 1024px) 40vw, 200px"
+                className="h-[290px] sm:h-[350px] w-auto"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    ) : (
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-lg shadow-black/5 transition-shadow duration-500 group-hover/preview:shadow-xl">
+        <div className="flex items-center gap-2 border-b border-border bg-muted/60 px-4 py-2.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+          <span className="h-2.5 w-2.5 rounded-full bg-amber-400/80" />
+          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+          <span className="ml-3 truncate rounded-md bg-background/80 px-3 py-0.5 text-[11px] text-muted-foreground">
+            {hostOf(liveUrl) || title}
+          </span>
+        </div>
+        <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+          <Image
+            src={cover.src}
+            alt={cover.alt}
+            fill
+            sizes="(max-width: 1024px) 100vw, 520px"
+            className="object-cover object-top transition-transform duration-700 group-hover/preview:scale-[1.04]"
+          />
+        </div>
+      </div>
+    );
+
+  const label = `Open ${title} live demo`;
+  return liveUrl ? (
+    <a href={liveUrl} target="_blank" rel="noopener noreferrer" aria-label={label} className="group/preview block">
+      {frame}
+    </a>
+  ) : (
+    <div className="group/preview">{frame}</div>
+  );
+}
 
 function ProjectCard({ project, index }: { project: ProjectData; index: number }) {
   const ref = useRef(null);
@@ -44,7 +116,8 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
       animate={isInView ? 'visible' : 'hidden'}
       variants={cardVariants}
       transition={{ delay: index * 0.12 }}
-      className="group">
+      className="group"
+    >
       <div
         className="
           relative
@@ -55,10 +128,21 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
           transition-all duration-500
           hover:border-border/60
           hover:bg-secondary/20
-        ">
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:gap-10">
-          {/* LEFT CONTENT */}
-          <div className="flex-1 space-y-6">
+        "
+      >
+        <div
+          className={`grid gap-8 lg:gap-12 lg:items-center ${
+            project.cover ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]' : ''
+          }`}
+        >
+          {project.cover && (
+            <div className={index % 2 === 0 ? 'lg:order-2' : ''}>
+              <ProjectPreview cover={project.cover} title={project.title} liveUrl={project.liveUrl} />
+            </div>
+          )}
+
+          {/* CONTENT */}
+          <div className="space-y-6">
             <div>
               {project.subtitle && (
                 <span className="text-xs tracking-widest uppercase text-muted-foreground">{project.subtitle}</span>
@@ -103,34 +187,34 @@ function ProjectCard({ project, index }: { project: ProjectData; index: number }
           hover:scale-[1.03]
           hover:shadow-sm
           ${colorClass}
-        `}>
+        `}
+                  >
                     {tech}
                   </span>
                 );
               })}
             </div>{' '}
-          </div>
+            {/* ACTIONS */}
+            <div className="flex flex-wrap gap-3 pt-2">
+              {/* DETAILS (FIXED MODAL TRIGGER) */}
+              <ProjectDetailModal project={project} />
 
-          {/* RIGHT ACTIONS */}
-          <div className="flex flex-wrap lg:flex-col gap-3 lg:items-end">
-            {/* DETAILS (FIXED MODAL TRIGGER) */}
-            <ProjectDetailModal project={project} />
+              {/* LIVE DEMO */}
+              {project.liveUrl && (
+                <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className={primaryButton}>
+                  Live Demo
+                  <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </a>
+              )}
 
-            {/* LIVE DEMO */}
-            {project.liveUrl && (
-              <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className={primaryButton}>
-                Live Demo
-                <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-            )}
-
-            {/* GITHUB */}
-            {project.githubUrl && (
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className={outlineButton}>
-                <Github className="w-4 h-4" />
-                Code
-              </a>
-            )}
+              {/* GITHUB */}
+              {project.githubUrl && (
+                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className={outlineButton}>
+                  <Github className="w-4 h-4" />
+                  Code
+                </a>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -153,18 +237,18 @@ export function ProjectsSection() {
       className="section-y section-padding scroll-mt-28"
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-      transition={{ duration }}>
+      transition={{ duration }}
+    >
       <div className="content-container">
         {/* HEADER */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: durationFast }}
-          className="mb-16">
+          className="mb-16"
+        >
           <span className="section-eyebrow">Selected Work</span>
-          <h2 className="section-title mt-4">
-            Projects
-          </h2>
+          <h2 className="section-title mt-4">Projects</h2>
         </motion.div>
 
         {/* LIST */}

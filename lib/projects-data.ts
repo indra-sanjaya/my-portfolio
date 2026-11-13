@@ -6,6 +6,16 @@ export type ProjectScreenshot = {
   label?: string;
 };
 
+/** The single preview shown on the project card. Browser shots get a window frame, phone shots a pair of devices. */
+export type ProjectCover = {
+  variant: 'browser' | 'phone';
+  src: string;
+  alt: string;
+  /** Second phone screen (phone variant only). */
+  secondarySrc?: string;
+  secondaryAlt?: string;
+};
+
 export type ProjectData = {
   id: string;
   title: string;
@@ -15,6 +25,7 @@ export type ProjectData = {
   techStack: string[];
   features: string[];
   challenges: string[];
+  cover?: ProjectCover;
   screenshots: ProjectScreenshot[];
   githubUrl?: string;
   liveUrl?: string;
@@ -70,6 +81,11 @@ export const projectsData: ProjectData[] = [
       'Prisma schema models users, posts, media, social accounts, AI planning sessions, and scenes in a single normalized database',
       'Better Auth manages OAuth flows and per-provider access token storage for multi-platform linking',
     ],
+    cover: {
+      variant: 'browser',
+      src: '/firework/post_editor.png',
+      alt: 'FireWork Studio post editor with live platform previews',
+    },
     screenshots: [
       {
         src: '/firework/analytics.png',
@@ -140,6 +156,7 @@ export const projectsData: ProjectData[] = [
       'Next.js route handlers cleanly separate product, user, wishlist, cart, checkout, and webhook concerns',
       'InfiniteScroll keyed to filter state so the scroll position and data reset correctly on every new query',
     ],
+    cover: { variant: 'browser', src: '/sprintzee/homepage.png', alt: 'SprintZee sneaker store homepage' },
     screenshots: [
       {
         src: '/sprintzee/homepage.png',
@@ -217,6 +234,7 @@ export const projectsData: ProjectData[] = [
       'Gemini call wrapped in a helper that falls back gracefully — if the API key is absent or the call fails, the trip is still created with a null itinerary rather than blocking the flow',
       'Both client and server are deployed as separate Vercel projects; GitHub OAuth redirect URI is configured to point at the server URL, with the token passed back to the client via query param redirect',
     ],
+    cover: { variant: 'browser', src: '/tripplanner/my_trips.png', alt: 'TripPlanner My Trips page with trip cards' },
     screenshots: [
       {
         src: '/tripplanner/landing_page.png',
@@ -286,6 +304,13 @@ export const projectsData: ProjectData[] = [
       'Navigation architecture uses a RootStack that renders entirely different screen sets based on isSignedIn from AuthContext, with no mixed authenticated/unauthenticated routes',
       'PostItem component handles both like and comment mutations inline with refetch callbacks, keeping the home feed and post detail screen always in sync',
     ],
+    cover: {
+      variant: 'phone',
+      src: '/voca/home_feed.jpg',
+      alt: 'VOCA home feed',
+      secondarySrc: '/voca/post_detail.jpg',
+      secondaryAlt: 'VOCA post detail with comments',
+    },
     screenshots: [
       {
         src: '/voca/home_feed.jpg',
