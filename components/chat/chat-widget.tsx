@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
-import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send, Sparkles, RotateCcw } from 'lucide-react';
 
 const SUGGESTED_PROMPTS = [
   'What projects has Indra built?',
@@ -80,11 +80,27 @@ export function ChatWidget() {
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error, regenerate, clearError } = useChat({
     transport: new DefaultChatTransport({ api: '/api/chat' }),
   });
 
   const isLoading = status === 'submitted' || status === 'streaming';
+
+  // Only judge "no answer" for a request that actually started (status is briefly 'ready' right after sending).
+  const [requestSeen, setRequestSeen] = useState(false);
+  useEffect(() => {
+    if (isLoading) setRequestSeen(true);
+  }, [isLoading]);
+
+  // A request that is cut off by the server timeout ends without an error, just without any answer.
+  const lastMessage = messages[messages.length - 1];
+  const gotNoAnswer =
+    requestSeen &&
+    status === 'ready' &&
+    !!lastMessage &&
+    (lastMessage.role === 'user' ||
+      (lastMessage.role === 'assistant' && !lastMessage.parts.some((p) => p.type === 'text' && p.text.trim())));
+  const showError = !isLoading && (status === 'error' || gotNoAnswer);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -92,6 +108,8 @@ export function ChatWidget() {
 
   const submitMessage = (text: string) => {
     if (!text.trim() || isLoading) return;
+    clearError();
+    setRequestSeen(false);
     sendMessage({ text });
     setInput('');
   };
@@ -179,6 +197,24 @@ export function ChatWidget() {
                       <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce [animation-delay:-0.15s]" />
                       <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" />
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {showError && (
+                <div role="alert" className="flex justify-start">
+                  <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-sm text-foreground">
+                    <p>The assistant is taking too long or is busy right now.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        clearError();
+                        setRequestSeen(false);
+                        regenerate();
+                      }}
+                      className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-background/60 px-3 py-1 text-xs font-medium hover:bg-background/90 transition-colors">
+                      <RotateCcw className="h-3 w-3" /> Try again
+                    </button>
                   </div>
                 </div>
               )}
