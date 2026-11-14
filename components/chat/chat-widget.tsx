@@ -5,12 +5,16 @@ import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MessageCircle, X, Send, Sparkles, RotateCcw } from 'lucide-react';
+import { CONTACT_LINKS } from '@/lib/profile-data';
 
 const SUGGESTED_PROMPTS = [
   'What projects has Indra built?',
   'Tell me about the AI integrations',
   'Is Indra a fit for a full-stack role?',
 ];
+
+const CONTACT_EMAIL = CONTACT_LINKS.find((l) => l.label === 'Email')?.href ?? '#contact';
+const CONTACT_LINKEDIN = CONTACT_LINKS.find((l) => l.label === 'LinkedIn')?.href ?? '#contact';
 
 const MARKDOWN_LINK_PATTERN = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
 const BARE_URL_PATTERN = /(https?:\/\/[^\s]+)/g;
@@ -205,6 +209,21 @@ export function ChatWidget() {
                 <div role="alert" className="flex justify-start">
                   <div className="max-w-[85%] rounded-2xl rounded-bl-sm border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-sm text-foreground">
                     <p>The assistant is taking too long or is busy right now.</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      You can also reach Indra directly via{' '}
+                      <a href={CONTACT_EMAIL} className="underline underline-offset-2 hover:text-hazard">
+                        email
+                      </a>{' '}
+                      or{' '}
+                      <a
+                        href={CONTACT_LINKEDIN}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline underline-offset-2 hover:text-hazard">
+                        LinkedIn
+                      </a>
+                      .
+                    </p>
                     <button
                       type="button"
                       onClick={() => {
