@@ -6,8 +6,17 @@ import { animate, motion, useInView } from "framer-motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useAnimationConfig } from "@/hooks/use-animation-config";
 import { CONTACT_LINKS } from "@/lib/profile-data";
+import { projectsData } from "@/lib/projects-data";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+
+/** Same per-project accents as the Projects section. */
+const PROJECT_ACCENT: Record<string, string> = {
+  "firework-studio": "#EA580C",
+  sprintzee: "#059669",
+  tripplanner: "#0284C7",
+  voca: "#7C3AED",
+};
 
 /** Accent palette shared with the rest of the sections: sky, emerald, violet, amber. */
 const STATS = [
@@ -168,31 +177,101 @@ function StatsRow() {
   );
 }
 
+const SLIDE_MS = 2000;
+
+const SLIDES = projectsData.filter((p) => p.cover).map((p) => ({
+  id: p.id,
+  title: p.title,
+  subtitle: p.subtitle ?? "",
+  cover: p.cover!,
+  host: hostOf(p.liveUrl) || p.title.toLowerCase(),
+  accent: PROJECT_ACCENT[p.id] ?? "#0284C7",
+}));
+
+function hostOf(url?: string) {
+  try {
+    return url ? new URL(url).hostname.replace(/^www\./, "") : "";
+  } catch {
+    return "";
+  }
+}
+
+function SlideImage({ slide, first }: { slide: (typeof SLIDES)[number]; first: boolean }) {
+  const { cover } = slide;
+  if (cover.variant === "phone") {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 via-secondary/40 to-primary/5">
+        <div className="flex h-[88%] items-center">
+          <div className="-rotate-3 h-full overflow-hidden rounded-[1.4rem] border-[4px] border-foreground/80 shadow-xl">
+            <Image src={cover.src} alt={cover.alt} width={411} height={838} sizes="200px" className="h-full w-auto" />
+          </div>
+          {cover.secondarySrc && (
+            <div className="-ml-6 mt-6 rotate-3 h-full overflow-hidden rounded-[1.4rem] border-[4px] border-foreground/80 shadow-xl">
+              <Image
+                src={cover.secondarySrc}
+                alt={cover.secondaryAlt ?? ""}
+                width={411}
+                height={839}
+                sizes="200px"
+                className="h-full w-auto"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <Image
+      src={cover.src}
+      alt={cover.alt}
+      fill
+      priority={first}
+      sizes="(max-width: 1024px) 92vw, 560px"
+      className="object-cover object-top"
+    />
+  );
+}
+
+/** Auto-advancing project preview: 2s per project, paused on hover/focus or while off-screen. */
 function ProductFrame() {
   const { durationSlow, prefersReduced } = useAnimationConfig();
   const k = prefersReduced ? 0 : 1;
+  const [index, setIndex] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const visible = useInView(rootRef, { amount: 0.3 });
+  const paused = hovered || !visible;
+  const slide = SLIDES[index];
+  const next = () => setIndex((i) => (i + 1) % SLIDES.length);
 
   return (
-    <motion.a
-      href="#project-tripplanner"
-      aria-label="See the TripPlanner project"
-      className="group relative block w-full max-w-[560px] mx-auto lg:max-w-none"
+    <motion.div
+      ref={rootRef}
+      className="relative mx-auto w-full max-w-[560px] lg:max-w-none"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setHovered(true)}
+      onBlurCapture={() => setHovered(false)}
       initial={{ opacity: 0, y: 36 * k, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: durationSlow * 1.2, delay: 0.45 * k, ease: EASE }}
     >
-      {/* soft coloured halo behind the frame */}
+      {/* soft halo behind the frame, tinted by the current project */}
       <div
         aria-hidden
-        className="absolute -inset-6 -z-10 rounded-[2rem] opacity-70"
+        className="absolute -inset-6 -z-10 rounded-[2rem] opacity-70 transition-[background] duration-700"
         style={{
-          background:
-            "radial-gradient(60% 60% at 30% 20%, rgba(14,165,233,0.22), transparent 70%), radial-gradient(60% 60% at 80% 80%, rgba(139,92,246,0.2), transparent 70%)",
+          background: `radial-gradient(60% 60% at 30% 20%, ${slide.accent}38, transparent 70%), radial-gradient(60% 60% at 80% 80%, #8B5CF633, transparent 70%)`,
           filter: "blur(36px)",
         }}
       />
       <div className="motion-safe:animate-[hero-float_9s_ease-in-out_infinite]">
-        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-2xl shadow-black/20 transition-transform duration-500 lg:[transform:perspective(1400px)_rotateY(-6deg)_rotateX(2deg)] lg:group-hover:[transform:perspective(1400px)_rotateY(-2deg)_rotateX(0deg)]">
+        <a
+          href={`#project-${slide.id}`}
+          aria-label={`See the ${slide.title} project`}
+          className="group block overflow-hidden rounded-xl border border-border bg-card shadow-2xl shadow-black/20 transition-transform duration-500 lg:[transform:perspective(1400px)_rotateY(-6deg)_rotateX(2deg)] lg:hover:[transform:perspective(1400px)_rotateY(-2deg)_rotateX(0deg)]"
+        >
           <div className="flex items-center gap-2 border-b border-border bg-muted/60 px-3.5 py-2.5">
             <span className="flex gap-1.5" aria-hidden>
               <span className="h-2.5 w-2.5 rounded-full bg-[#F87171]/70" />
@@ -200,28 +279,60 @@ function ProductFrame() {
               <span className="h-2.5 w-2.5 rounded-full bg-[#34D399]/70" />
             </span>
             <span className="ml-2 truncate rounded-md bg-background/70 px-3 py-0.5 font-mono text-[11px] text-muted-foreground">
-              tripplanner.app
+              {slide.host}
             </span>
           </div>
           <div className="relative aspect-[16/10] bg-muted">
-            <Image
-              src="/tripplanner/itinerary_detail.png"
-              alt="TripPlanner itinerary page showing an AI-generated day-by-day plan"
-              fill
-              priority
-              sizes="(max-width: 1024px) 92vw, 560px"
-              className="object-cover object-top"
-            />
+            {SLIDES.map((s, i) => (
+              <div
+                key={s.id}
+                aria-hidden={i !== index}
+                className={`absolute inset-0 transition-opacity duration-500 ${i === index ? "opacity-100" : "opacity-0"}`}
+              >
+                <SlideImage slide={s} first={i === 0} />
+              </div>
+            ))}
           </div>
-        </div>
+        </a>
 
-        <div className="absolute -bottom-4 left-4 sm:-left-4 flex items-center gap-2 rounded-full border border-border bg-background/90 px-3.5 py-1.5 text-xs font-medium text-foreground shadow-lg backdrop-blur">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" aria-hidden />
-          TripPlanner · Gemini-powered itineraries
-          <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        <div className="absolute -bottom-4 left-4 flex max-w-[calc(100%-2rem)] items-center gap-2 rounded-full border border-border bg-background/90 px-3.5 py-1.5 text-xs font-medium text-foreground shadow-lg backdrop-blur sm:-left-4">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: slide.accent }} aria-hidden />
+          <span className="truncate" aria-live="off">
+            {slide.title}
+            {slide.subtitle && <span className="text-muted-foreground"> · {slide.subtitle}</span>}
+          </span>
+          <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         </div>
       </div>
-    </motion.a>
+
+      {/* Slide indicators: the active one fills over 2s and advances the slideshow */}
+      <div className="mt-10 flex items-center justify-center gap-2" role="tablist" aria-label="Project previews">
+        {SLIDES.map((s, i) => (
+          <button
+            key={s.id}
+            type="button"
+            role="tab"
+            aria-selected={i === index}
+            aria-label={`Show ${s.title}`}
+            onClick={() => setIndex(i)}
+            className="relative h-1 w-8 overflow-hidden rounded-full bg-border sm:w-10"
+          >
+            {i === index && (
+              <span
+                key={`${index}`}
+                className="hero-progress absolute inset-0 origin-left"
+                style={{
+                  background: s.accent,
+                  animationDuration: `${SLIDE_MS}ms`,
+                  animationPlayState: paused ? "paused" : "running",
+                }}
+                onAnimationEnd={next}
+              />
+            )}
+          </button>
+        ))}
+      </div>
+    </motion.div>
   );
 }
 
@@ -282,9 +393,9 @@ export function HeroSection() {
               </span>
             </motion.div>
 
-            <h1 className="mt-7 text-[clamp(2.25rem,5.6vw,4.25rem)] font-medium tracking-tight text-foreground leading-[1.06]">
-              <RevealLine delay={0.1}>Industrial-grade rigor,</RevealLine>
-              <RevealLine delay={0.22}>applied to</RevealLine>
+            <h1 className="mt-7 text-[clamp(1.9rem,8.2vw,3.75rem)] lg:text-[min(4.1vw,4.25rem)] font-medium tracking-tight text-foreground leading-[1.06]">
+              <RevealLine delay={0.1}>Industrial-grade</RevealLine>
+              <RevealLine delay={0.22}>rigor, applied to</RevealLine>
               <RevealLine delay={0.34}>
                 <span
                   style={{
